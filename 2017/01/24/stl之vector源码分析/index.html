@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="gcc,stl,vector,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 准备1.1 源码版本 gcc-6.3  1.2 文件目录 gcc-6.3\libstdc++-v3\include\bits\stl_vector.hgcc-6.3\libstdc++-v3\include\bits\vector.tcc">
+<meta name="keywords" content="gcc,stl,vector">
+<meta property="og:type" content="article">
+<meta property="og:title" content="stl之vector源码分析">
+<meta property="og:url" content="https://zhouxj25.github.io/2017/01/24/stl之vector源码分析/index.html">
+<meta property="og:site_name" content="Zhouxj25&#39;s Blog">
+<meta property="og:description" content="1. 准备1.1 源码版本 gcc-6.3  1.2 文件目录 gcc-6.3\libstdc++-v3\include\bits\stl_vector.hgcc-6.3\libstdc++-v3\include\bits\vector.tcc">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://www.plantuml.com/plantuml/svg/ROz1JiCm44NNv1IZLa8fj55tbL3eiZjM8BRMr9cc8naxiaULeFGad88r4hT1N0EdRgAcOZV-__tn_2SMGp1w9YtE_tv-_NnyZpALdcgDWG1kPZFe57vf3Do1TbQGRSY6QFaUqTrHo39jC8HXi2mXVvoELwl5OZwVm79vIHstxBEhM_MG4kVnA3UEhP27QACnJgDG7lYDb4oYktDSjLP5lNaAJA6Z3l_TjH-k3e9UXjA6BOVjK2DRARU9jFDOKxyvzJ_kJECrk8Oynka-xy-C9DSsBugYbLWI06kgsRRKk2lJLL4OlzEkUJrbUY1U9eocxLTnQ53qzXBnQ6iw0vD_-0C0">
+<meta property="og:updated_time" content="2018-12-16T12:18:07.413Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="stl之vector源码分析">
+<meta name="twitter:description" content="1. 准备1.1 源码版本 gcc-6.3  1.2 文件目录 gcc-6.3\libstdc++-v3\include\bits\stl_vector.hgcc-6.3\libstdc++-v3\include\bits\vector.tcc">
+<meta name="twitter:image" content="http://www.plantuml.com/plantuml/svg/ROz1JiCm44NNv1IZLa8fj55tbL3eiZjM8BRMr9cc8naxiaULeFGad88r4hT1N0EdRgAcOZV-__tn_2SMGp1w9YtE_tv-_NnyZpALdcgDWG1kPZFe57vf3Do1TbQGRSY6QFaUqTrHo39jC8HXi2mXVvoELwl5OZwVm79vIHstxBEhM_MG4kVnA3UEhP27QACnJgDG7lYDb4oYktDSjLP5lNaAJA6Z3l_TjH-k3e9UXjA6BOVjK2DRARU9jFDOKxyvzJ_kJECrk8Oynka-xy-C9DSsBugYbLWI06kgsRRKk2lJLL4OlzEkUJrbUY1U9eocxLTnQ53qzXBnQ6iw0vD_-0C0">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhouxj25.github.io/2017/01/24/stl之vector源码分析/">
+
+
+
+
+
+  <title>stl之vector源码分析 | Zhouxj25's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zhouxj25's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">每天都有收获的感觉真爽！！！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2017/01/24/stl之vector源码分析/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zhouxj25">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhouxj25's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">stl之vector源码分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T12:30:00+08:00">
+                2017-01-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/blog/" itemprop="url" rel="index">
+                    <span itemprop="name">blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-准备"><a href="#1-准备" class="headerlink" title="1. 准备"></a>1. 准备</h2><h3 id="1-1-源码版本"><a href="#1-1-源码版本" class="headerlink" title="1.1 源码版本"></a>1.1 源码版本</h3><blockquote>
+<p>gcc-6.3</p>
+</blockquote>
+<h3 id="1-2-文件目录"><a href="#1-2-文件目录" class="headerlink" title="1.2 文件目录"></a>1.2 文件目录</h3><blockquote>
+<p>gcc-6.3\libstdc++-v3\include\bits\stl_vector.h<br>gcc-6.3\libstdc++-v3\include\bits\vector.tcc</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="2-类关系概述"><a href="#2-类关系概述" class="headerlink" title="2. 类关系概述"></a>2. 类关系概述</h2><h3 id="2-1-类关系UML图"><a href="#2-1-类关系UML图" class="headerlink" title="2.1 类关系UML图"></a>2.1 类关系UML图</h3><img src="http://www.plantuml.com/plantuml/svg/ROz1JiCm44NNv1IZLa8fj55tbL3eiZjM8BRMr9cc8naxiaULeFGad88r4hT1N0EdRgAcOZV-__tn_2SMGp1w9YtE_tv-_NnyZpALdcgDWG1kPZFe57vf3Do1TbQGRSY6QFaUqTrHo39jC8HXi2mXVvoELwl5OZwVm79vIHstxBEhM_MG4kVnA3UEhP27QACnJgDG7lYDb4oYktDSjLP5lNaAJA6Z3l_TjH-k3e9UXjA6BOVjK2DRARU9jFDOKxyvzJ_kJECrk8Oynka-xy-C9DSsBugYbLWI06kgsRRKk2lJLL4OlzEkUJrbUY1U9eocxLTnQ53qzXBnQ6iw0vD_-0C0">
+<h3 id="2-2-类概述"><a href="#2-2-类概述" class="headerlink" title="2.2 类概述"></a>2.2 类概述</h3><h4 id="2-2-1-Vector-base"><a href="#2-2-1-Vector-base" class="headerlink" title="2.2.1 _Vector_base"></a>2.2.1 _Vector_base</h4><p>&emsp;&emsp;Vector的基类，主要进行内存的管理，调用内存分配器_Alloc进行内存的分配和释放。  </p>
+<h4 id="2-2-2-Vector-impl"><a href="#2-2-2-Vector-impl" class="headerlink" title="2.2.2 _Vector_impl"></a>2.2.2 _Vector_impl</h4><p>&emsp;&emsp;_Vector_base类的内嵌部分，负责记录_Vector_base分配的内存，三个pointer成员_M_start、_M_finish和_M_end_of_storage分别指向内存的开始、实际已使用内存结尾位置和已分配的内存结尾位置。</p>
+<h4 id="2-2-4-vector"><a href="#2-2-4-vector" class="headerlink" title="2.2.4 vector"></a>2.2.4 vector</h4><p>&emsp;&emsp;vector的实现部分，类定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename _Tp, typename _Alloc = std::allocator&lt;_Tp&gt; &gt;</span><br><span class="line">    class vector : protected _Vector_base&lt;_Tp, _Alloc&gt;</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>其中_Tp为元素类型，_Alloc为内存分配器的类型，默认是<a href="/stl之内存分配器.md">std::allocator</a>。关于该类的大致介绍以及各成员函数的定义请参考<a href="http://www.cplusplus.com/reference/vector/vector/" target="_blank" rel="noopener">std::vector</a></p>
+<h2 id="3-vector部分成员函数详解"><a href="#3-vector部分成员函数详解" class="headerlink" title="3. vector部分成员函数详解"></a>3. vector部分成员函数详解</h2><h3 id="3-1-构造函数解析"><a href="#3-1-构造函数解析" class="headerlink" title="3.1 构造函数解析"></a>3.1 构造函数解析</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"> 	<span class="built_in">vector</span>()		<span class="comment">//默认构造函数</span></span><br><span class="line">      : _Base() &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">explicit</span></span><br><span class="line">      <span class="built_in">vector</span>(size_type __n, <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">      : _Base(__n, __a)		<span class="comment">//基类分配能容纳__n个元素的内存块</span></span><br><span class="line">      &#123; _M_default_initialize(__n); &#125;	<span class="comment">//默认值初始化内存块各元素</span></span><br><span class="line">	  </span><br><span class="line">      <span class="built_in">vector</span>(size_type __n, <span class="keyword">const</span> value_type&amp; __value,	<span class="comment">//__n个值为__value的元素初始化vector</span></span><br><span class="line">	     <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">      : _Base(__n, __a)		<span class="comment">//基类分配能容纳__n个元素的内存块</span></span><br><span class="line">      &#123; _M_fill_initialize(__n, __value); &#125;	<span class="comment">//用__value初始化内存块各元素</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">explicit</span></span><br><span class="line">      <span class="built_in">vector</span>(size_type __n, <span class="keyword">const</span> value_type&amp; __value = value_type(),	<span class="comment">//__n个取默认值的元素初始化vector</span></span><br><span class="line">	     <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">      : _Base(__n, __a)</span><br><span class="line">      &#123; _M_fill_initialize(__n, __value); &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      <span class="built_in">vector</span>(<span class="keyword">const</span> <span class="built_in">vector</span>&amp; __x)	<span class="comment">//左值拷贝构造函数</span></span><br><span class="line">      : _Base(__x.size(),</span><br><span class="line">        _Alloc_traits::_S_select_on_copy(__x._M_get_Tp_allocator()))</span><br><span class="line">      &#123; <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">	  <span class="built_in">std</span>::__uninitialized_copy_a(__x.begin(), __x.end(),</span><br><span class="line">				      <span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">				      _M_get_Tp_allocator());	<span class="comment">//从将__x全部内容拷贝到该容器</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="built_in">vector</span>(<span class="built_in">vector</span>&amp;&amp; __x) <span class="keyword">noexcept</span>	<span class="comment">//右值拷贝构造函数</span></span><br><span class="line">      : _Base(<span class="built_in">std</span>::move(__x)) &#123; &#125;	<span class="comment">//move函数实现内存指针的替换（vector内存指针指向__x指针指向的地址，而__x的指针变为									//nullptr），用__x的内存分配器初始化vector的内存分配器</span></span><br><span class="line">      <span class="built_in">vector</span>(<span class="keyword">const</span> <span class="built_in">vector</span>&amp; __x, <span class="keyword">const</span> allocator_type&amp; __a)</span><br><span class="line">      : _Base(__x.size(), __a)</span><br><span class="line">      &#123; <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">	  <span class="built_in">std</span>::__uninitialized_copy_a(__x.begin(), __x.end(),</span><br><span class="line">				      <span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">				      _M_get_Tp_allocator());</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="built_in">vector</span>(<span class="built_in">vector</span>&amp;&amp; __rv, <span class="keyword">const</span> allocator_type&amp; __m)	<span class="comment">//右值拷贝构造函数，带内存分配器</span></span><br><span class="line">      <span class="keyword">noexcept</span>(_Alloc_traits::_S_always_equal())</span><br><span class="line">      : _Base(<span class="built_in">std</span>::move(__rv), __m)	<span class="comment">//实现内存指针的替换或者内存的重新分配，用内存分配器__m初始化vector的内存分配器</span></span><br><span class="line">      &#123;</span><br><span class="line">	<span class="keyword">if</span> (__rv.get_allocator() != __m)<span class="comment">//如果__rv的内存分配器与__m不同，则vector是进行了内存的重新分配，需要进一步初始化</span></span><br><span class="line">	  &#123;</span><br><span class="line">	    <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">	      <span class="built_in">std</span>::__uninitialized_move_a(__rv.begin(), __rv.end(),	<span class="comment">//用move迭代器实现数据的拷贝，这样避免内存拷贝</span></span><br><span class="line">					  <span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">					  _M_get_Tp_allocator());</span><br><span class="line">	    __rv.clear();	<span class="comment">//清空__rv数据元素</span></span><br><span class="line">	  &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="built_in">vector</span>(<span class="built_in">initializer_list</span>&lt;value_type&gt; __l,</span><br><span class="line">	     <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">      : _Base(__a)</span><br><span class="line">      &#123;</span><br><span class="line">	_M_range_initialize(__l.begin(), __l.end(),</span><br><span class="line">			    random_access_iterator_tag());</span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator,</span><br><span class="line">	       <span class="keyword">typename</span> = <span class="built_in">std</span>::_RequireInputIter&lt;_InputIterator&gt;&gt;</span><br><span class="line">        <span class="built_in">vector</span>(_InputIterator __first, _InputIterator __last,	<span class="comment">//用其它vector的两个迭代器初始化vector</span></span><br><span class="line">	       <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">	: _Base(__a)</span><br><span class="line">        &#123; _M_initialize_dispatch(__first, __last, __false_type()); &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line">        <span class="built_in">vector</span>(_InputIterator __first, _InputIterator __last,</span><br><span class="line">	       <span class="keyword">const</span> allocator_type&amp; __a = allocator_type())</span><br><span class="line">	: _Base(__a)</span><br><span class="line">        &#123;</span><br><span class="line">	  <span class="comment">// Check whether it's an integral type.  If so, it's not an iterator.</span></span><br><span class="line">	  <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::__is_integer&lt;_InputIterator&gt;::__type _Integral;<span class="comment">//确定_InputIterator是否是__is_integer，这里肯定不是</span></span><br><span class="line">	  _M_initialize_dispatch(__first, __last, _Integral());</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<font color="red" size="2">__false_type、__is_integer</font><font>：定义在bits/cpp_type_traits.h里面的两个结构体。</font>
+
+<p><a href="#_M_initialize_dispatch"><font color="red" size="2">_M_initialize_dispatch</font></a>  </p>
+<h3 id="3-2-赋值操作符operator"><a href="#3-2-赋值操作符operator" class="headerlink" title="3.2 赋值操作符operator="></a>3.2 赋值操作符operator=</h3><h4 id="3-2-1-左值赋值"><a href="#3-2-1-左值赋值" class="headerlink" title="3.2.1 左值赋值"></a>3.2.1 左值赋值</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line">    <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;&amp;</span><br><span class="line">    <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">    <span class="keyword">operator</span>=(<span class="keyword">const</span> <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;&amp; __x)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (&amp;__x != <span class="keyword">this</span>)	#__x不是自己</span><br><span class="line">	&#123;</span><br><span class="line">#<span class="keyword">if</span> __cplusplus &gt;= <span class="number">201103L</span></span><br><span class="line">	  <span class="keyword">if</span> (_Alloc_traits::_S_propagate_on_copy_assign())</span><br><span class="line">	    &#123;</span><br><span class="line">	      <span class="keyword">if</span> (!_Alloc_traits::_S_always_equal()</span><br><span class="line">	          &amp;&amp; _M_get_Tp_allocator() != __x._M_get_Tp_allocator())</span><br><span class="line">	        &#123;</span><br><span class="line">		  <span class="comment">// replacement allocator cannot free existing storage</span></span><br><span class="line">		  <span class="keyword">this</span>-&gt;clear();		<span class="comment">//清空原存储空间元素，调用元素的析构函数</span></span><br><span class="line">		  _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">				<span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">				- <span class="keyword">this</span>-&gt;_M_impl._M_start);	<span class="comment">//释放原存储空间</span></span><br><span class="line">		  <span class="keyword">this</span>-&gt;_M_impl._M_start = <span class="literal">nullptr</span>;</span><br><span class="line">		  <span class="keyword">this</span>-&gt;_M_impl._M_finish = <span class="literal">nullptr</span>;</span><br><span class="line">		  <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = <span class="literal">nullptr</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	      <span class="built_in">std</span>::__alloc_on_copy(_M_get_Tp_allocator(),</span><br><span class="line">				   __x._M_get_Tp_allocator());	<span class="comment">//拷贝__x的内存分配器作为本内存分配器</span></span><br><span class="line">	 &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">	  <span class="keyword">const</span> size_type __xlen = __x.size();</span><br><span class="line">	  <span class="keyword">if</span> (__xlen &gt; capacity())	<span class="comment">//原存储空间总大小小于需要分配的大小</span></span><br><span class="line">	    &#123;</span><br><span class="line">	      pointer __tmp = _M_allocate_and_copy(__xlen, __x.begin(),</span><br><span class="line">						   __x.end());	<span class="comment">//重新分配内存并拷贝元素</span></span><br><span class="line">	      <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">			    _M_get_Tp_allocator());	<span class="comment">//清空内存元素</span></span><br><span class="line">	      _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">			    <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">			    - <span class="keyword">this</span>-&gt;_M_impl._M_start);	<span class="comment">//释放原内存空间</span></span><br><span class="line">	      <span class="keyword">this</span>-&gt;_M_impl._M_start = __tmp;	<span class="comment">//指向新分配的内存</span></span><br><span class="line">	      <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = <span class="keyword">this</span>-&gt;_M_impl._M_start + __xlen;</span><br><span class="line">	    &#125;</span><br><span class="line">	   <span class="keyword">else</span> <span class="keyword">if</span> (size() &gt;= __xlen)<span class="comment">//原存储空间元素个数大于需要分配的大小</span></span><br><span class="line">	    &#123;</span><br><span class="line">	      <span class="built_in">std</span>::_Destroy(<span class="built_in">std</span>::copy(__x.begin(), __x.end(), begin()),	<span class="comment">//将__x拷贝到原存储空间</span></span><br><span class="line">			    end(), _M_get_Tp_allocator());	<span class="comment">//清空原存储空间后面未被拷贝的元素对象</span></span><br><span class="line">	    &#125;</span><br><span class="line">	   <span class="keyword">else</span>	<span class="comment">//((__xlen &lt;= capacity()) &amp;&amp; (size() &lt; __xlen))</span></span><br><span class="line">	    &#123;</span><br><span class="line">	      <span class="built_in">std</span>::copy(__x._M_impl._M_start, __x._M_impl._M_start + size(),</span><br><span class="line">			<span class="keyword">this</span>-&gt;_M_impl._M_start);	<span class="comment">//拷贝前面部分size()个元素</span></span><br><span class="line">	      <span class="built_in">std</span>::__uninitialized_copy_a(__x._M_impl._M_start + size(),</span><br><span class="line">					  __x._M_impl._M_finish,</span><br><span class="line">					  <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">					  _M_get_Tp_allocator());<span class="comment">//后面部分元素除了拷贝之外还需要初始化</span></span><br><span class="line">	    &#125;</span><br><span class="line">	  <span class="keyword">this</span>-&gt;_M_impl._M_finish = <span class="keyword">this</span>-&gt;_M_impl._M_start + __xlen;</span><br><span class="line">	&#125;</span><br><span class="line">      <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="3-2-2-右值赋值"><a href="#3-2-2-右值赋值" class="headerlink" title="3.2.2 右值赋值"></a>3.2.2 右值赋值</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&amp;</span><br><span class="line">      <span class="keyword">operator</span>=(<span class="built_in">vector</span>&amp;&amp; __x) <span class="keyword">noexcept</span>(_Alloc_traits::_S_nothrow_move())<span class="comment">//不抛异常</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">constexpr</span> <span class="keyword">bool</span> __move_storage =</span><br><span class="line">          _Alloc_traits::_S_propagate_on_move_assign() <span class="comment">//偏特化的allocator_traits&lt;allocator&lt;_Tp&gt;&gt;为true_type</span></span><br><span class="line">          || _Alloc_traits::_S_always_equal();	<span class="comment">//为true_type</span></span><br><span class="line">        _M_move_assign(<span class="built_in">std</span>::move(__x), __bool_constant&lt;__move_storage&gt;());<span class="comment">//执行_M_move_assign(vector&amp;&amp; __x, std::true_type)</span></span><br><span class="line">	<span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+<font color="red" size="2">_S_nothrow_move、_S_propagate_on_move_assign、_S_always_equal</font><font>：定义在ext/alloc_traits.h文件。</font>  
+
+<font color="red" size="2">_M_move_assign</font><font>：交换两个vector的内存空间以及内存分配器</font>
+
+<h3 id="3-3-分派函数assign"><a href="#3-3-分派函数assign" class="headerlink" title="3.3 分派函数assign"></a>3.3 分派函数assign</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">void</span></span><br><span class="line">      assign(size_type __n, <span class="keyword">const</span> value_type&amp; __val)</span><br><span class="line">      &#123; _M_fill_assign(__n, __val); &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator,</span><br><span class="line">	       <span class="keyword">typename</span> = <span class="built_in">std</span>::_RequireInputIter&lt;_InputIterator&gt;&gt;<span class="comment">//如果类型_InputIterator能转换为输入类型迭代器，则这个函数有效</span></span><br><span class="line">        <span class="keyword">void</span></span><br><span class="line">        assign(_InputIterator __first, _InputIterator __last)</span><br><span class="line">        &#123; _M_assign_dispatch(__first, __last, __false_type()); &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line">        <span class="keyword">void</span></span><br><span class="line">        assign(_InputIterator __first, _InputIterator __last)</span><br><span class="line">        &#123;</span><br><span class="line">	  <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::__is_integer&lt;_InputIterator&gt;::__type _Integral;</span><br><span class="line">	  _M_assign_dispatch(__first, __last, _Integral());<span class="comment">//根据_InputIterator是否为interger型来调用_M_assign_dispatch的重载函数，如果是的，则_InputIterator不是迭代器</span></span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<font color="red" size="2">std::_RequireInputIter</font><font>：定义在bits/stl_iterator_base_type.h文件。</font>  
+
+<p><a href="#_M_assign_dispatch"><font color="red" size="2">_M_assign_dispatch</font></a>  </p>
+<h3 id="3-4-重设元素个数函数resize"><a href="#3-4-重设元素个数函数resize" class="headerlink" title="3.4 重设元素个数函数resize"></a>3.4 重设元素个数函数resize</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      resize(size_type __new_size)</span><br><span class="line">      &#123;</span><br><span class="line">	<span class="keyword">if</span> (__new_size &gt; size())</span><br><span class="line">	  _M_default_append(__new_size - size());<span class="comment">//使用内存分配器调用默认构造函数补充元素</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (__new_size &lt; size())</span><br><span class="line">	  _M_erase_at_end(<span class="keyword">this</span>-&gt;_M_impl._M_start + __new_size);<span class="comment">//删除多余的元素个数，释放元素占用资源</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      resize(size_type __new_size, <span class="keyword">const</span> value_type&amp; __x)</span><br><span class="line">      &#123;</span><br><span class="line">	<span class="keyword">if</span> (__new_size &gt; size())</span><br><span class="line">	  insert(end(), __new_size - size(), __x);<span class="comment">//调用本insert函数补充元素</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (__new_size &lt; size())</span><br><span class="line">	  _M_erase_at_end(<span class="keyword">this</span>-&gt;_M_impl._M_start + __new_size);</span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      resize(size_type __new_size, value_type __x = value_type())</span><br><span class="line">      &#123;</span><br><span class="line">	<span class="keyword">if</span> (__new_size &gt; size())</span><br><span class="line">	  insert(end(), __new_size - size(), __x);</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (__new_size &lt; size())</span><br><span class="line">	  _M_erase_at_end(<span class="keyword">this</span>-&gt;_M_impl._M_start + __new_size);</span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p><font color="red" size="2">_M_erase_at_end</font><font>：释放后面元素的资源</font><br><a href="#_M_default_append"><font color="red" size="2">_M_default_append</font></a><br><a href="#insert"><font color="red" size="2">insert</font></a>  </p>
+<h3 id="3-5-后面添加元素函数push-back"><a href="#3-5-后面添加元素函数push-back" class="headerlink" title="3.5 后面添加元素函数push_back"></a>3.5 后面添加元素函数push_back</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">void</span></span><br><span class="line">      push_back(<span class="keyword">const</span> value_type&amp; __x)<span class="comment">//添加左值元素</span></span><br><span class="line">      &#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_M_impl._M_finish != <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage)</span><br><span class="line">	  &#123;</span><br><span class="line">	    _Alloc_traits::construct(<span class="keyword">this</span>-&gt;_M_impl, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">	                             __x);<span class="comment">//如果还有多余的内存空间，则在end()位置初始化该元素</span></span><br><span class="line">	    ++<span class="keyword">this</span>-&gt;_M_impl._M_finish;</span><br><span class="line">	  &#125;</span><br><span class="line">	<span class="keyword">else</span>	<span class="comment">//空间不够则重新申请空间进行元素的插入</span></span><br><span class="line">#<span class="keyword">if</span> __cplusplus &gt;= <span class="number">201103L</span></span><br><span class="line">	  _M_emplace_back_aux(__x);<span class="comment">//用std::move()的方式进行元素的拷贝操作，提高效率</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">	  _M_insert_aux(end(), __x);<span class="comment">//用std::copy进行元素的拷贝</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      push_back(value_type&amp;&amp; __x)<span class="comment">//添加右值元素</span></span><br><span class="line">      &#123; emplace_back(<span class="built_in">std</span>::move(__x)); &#125;<span class="comment">//用std::move()的方式进行元素的拷贝操作，提高效率</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p><a href="#_M_emplace_back_aux"><font color="red" size="2">_M_emplace_back_aux</font></a><br><a href="#_M_insert_aux"><font color="red" size="2">_M_insert_aux</font></a><br><a href="#emplace_back"><font color="red" size="2">emplace_back</font></a>  </p>
+<h3 id="3-6-插入函数insert"><a href="#3-6-插入函数insert" class="headerlink" title="3.6 插入函数insert"></a>3.6 插入函数<font id="insert">insert</font></h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">      iterator</span><br><span class="line">      insert(iterator __position, <span class="keyword">const</span> value_type&amp; __x)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">const</span> size_type __n = __position - begin();</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_M_impl._M_finish != <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">	       &amp;&amp; __position == end())	<span class="comment">//在最后面end()插入一个元素</span></span><br><span class="line">        &#123;</span><br><span class="line">          _Alloc_traits::construct(<span class="keyword">this</span>-&gt;_M_impl, <span class="keyword">this</span>-&gt;_M_impl._M_finish, __x);<span class="comment">//最后面进行元素初始化</span></span><br><span class="line">          ++<span class="keyword">this</span>-&gt;_M_impl._M_finish;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>	<span class="comment">//在中间进行插入</span></span><br><span class="line">        &#123;</span><br><span class="line">#<span class="keyword">if</span> __cplusplus &gt;= <span class="number">201103L</span></span><br><span class="line">          <span class="keyword">const</span> <span class="keyword">auto</span> __pos = begin() + (__position - cbegin());</span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_M_impl._M_finish != <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage)</span><br><span class="line">          &#123;</span><br><span class="line">            _Tp __x_copy = __x;		<span class="comment">//还有剩余空间的时候，会将__pos的原有元素移到end()后面一个位置，在那里进行原有元素的初始化construct,</span></span><br><span class="line">            _M_insert_aux(__pos, <span class="built_in">std</span>::move(__x_copy));<span class="comment">//然后再在__pos上赋值__x_copy，由于原有空间已经进行过元素初始化，没必要再construct，所以用move进行完美转发，提高效率。</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">else</span></span><br><span class="line">            _M_insert_aux(__pos, __x);<span class="comment">//在内存空间不够的时候需要重新申请空间，极有可能在新的内存空间插入数据，都需要进行construct，所以没必要再用move</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">            _M_insert_aux(__position, __x);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> iterator(<span class="keyword">this</span>-&gt;_M_impl._M_start + __n);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      iterator</span><br><span class="line">      insert(const_iterator __position, value_type&amp;&amp; __x)</span><br><span class="line">      &#123; <span class="keyword">return</span> emplace(__position, <span class="built_in">std</span>::move(__x)); &#125;<span class="comment">//插入右值，采用emplace的方式提高效率</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      iterator</span><br><span class="line">      insert(const_iterator __position, size_type __n, <span class="keyword">const</span> value_type&amp; __x)</span><br><span class="line">      &#123;</span><br><span class="line">        difference_type __offset = __position - cbegin();</span><br><span class="line">        _M_fill_insert(begin() + __offset, __n, __x);<span class="comment">//进行批量数据的插入</span></span><br><span class="line">        <span class="keyword">return</span> begin() + __offset;</span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      insert(iterator __position, size_type __n, <span class="keyword">const</span> value_type&amp; __x)</span><br><span class="line">      &#123; _M_fill_insert(__position, __n, __x); &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator,</span><br><span class="line">	       <span class="keyword">typename</span> = <span class="built_in">std</span>::_RequireInputIter&lt;_InputIterator&gt;&gt;<span class="comment">//如果_InputIterator能转为输入类型迭代器，则调用这个insert版本</span></span><br><span class="line">      iterator</span><br><span class="line">      insert(const_iterator __position, _InputIterator __first,</span><br><span class="line">        _InputIterator __last)</span><br><span class="line">      &#123;</span><br><span class="line">        difference_type __offset = __position - cbegin();</span><br><span class="line">          _M_insert_dispatch(begin() + __offset,</span><br><span class="line">          __first, __last, __false_type());<span class="comment">//调用_M_insert_dispatch的false_type版本</span></span><br><span class="line">        <span class="keyword">return</span> begin() + __offset;</span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      insert(iterator __position, _InputIterator __first,</span><br><span class="line">        _InputIterator __last)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::__is_integer&lt;_InputIterator&gt;::__type _Integral;</span><br><span class="line">        _M_insert_dispatch(__position, __first, __last, _Integral());<span class="comment">//根据_InputIterator是否为integer类型，调用不同的_M_insert_dispatch版本</span></span><br><span class="line">      &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p><a href="#_M_fill_insert"><font color="red" size="2">_M_fill_insert</font></a><br><a href="#_M_insert_dispatch"><font color="red" size="2">_M_insert_dispatch</font></a>  </p>
+<h3 id="3-7-内部函数的解析"><a href="#3-7-内部函数的解析" class="headerlink" title="3.7 内部函数的解析"></a>3.7 内部函数的解析</h3><h4 id="3-7-1-M-allocate-and-copy"><a href="#3-7-1-M-allocate-and-copy" class="headerlink" title="3.7.1 _M_allocate_and_copy"></a>3.7.1 <font id="_M_allocate_and_copy">_M_allocate_and_copy</font></h4><p>定义：分配<strong>n个大小的内存空间，并将</strong>first到__last的数据拷贝到新的内存空间<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _ForwardIterator&gt;</span><br><span class="line"> pointer</span><br><span class="line"> _M_allocate_and_copy(size_type __n,</span><br><span class="line">   _ForwardIterator __first, _ForwardIterator __last)</span><br><span class="line"> &#123;</span><br><span class="line">   pointer __result = <span class="keyword">this</span>-&gt;_M_allocate(__n);</span><br><span class="line">   __try</span><br><span class="line">   &#123;</span><br><span class="line">     <span class="built_in">std</span>::__uninitialized_copy_a(__first, __last, __result,</span><br><span class="line">       _M_get_Tp_allocator());</span><br><span class="line">     <span class="keyword">return</span> __result;</span><br><span class="line">   &#125;</span><br><span class="line">   __catch(...)</span><br><span class="line">   &#123;</span><br><span class="line">     _M_deallocate(__result, __n);</span><br><span class="line">     __throw_exception_again;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-2-M-initialize-dispatch"><a href="#3-7-2-M-initialize-dispatch" class="headerlink" title="3.7.2 _M_initialize_dispatch"></a>3.7.2 <font id="_M_initialize_dispatch">_M_initialize_dispatch</font></h4><p>定义：初始化分派函数，按元素个数或者迭代器范围进行初始化<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Integer&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_initialize_dispatch(_Integer __n, _Integer __value, __true_type)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_start = _M_allocate(<span class="keyword">static_cast</span>&lt;size_type&gt;(__n));<span class="comment">//分配内存空间</span></span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage =</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_start + <span class="keyword">static_cast</span>&lt;size_type&gt;(__n);</span><br><span class="line">  _M_fill_initialize(<span class="keyword">static_cast</span>&lt;size_type&gt;(__n), __value);<span class="comment">//填充__n个值为__value的元素到内存空间，进行初始化</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_initialize_dispatch(_InputIterator __first, _InputIterator __last,</span><br><span class="line">  __false_type)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;_InputIterator&gt;::</span><br><span class="line">    iterator_category _IterCategory;</span><br><span class="line">  _M_range_initialize(__first, __last, _IterCategory());<span class="comment">//根据迭代器的类型，调用不同的版本进行范围初始化</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-3-M-range-initialize"><a href="#3-7-3-M-range-initialize" class="headerlink" title="3.7.3 _M_range_initialize"></a>3.7.3 <font id="_M_range_initialize">_M_range_initialize</font></h4><p>定义：按迭代器给的范围进行初始化<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line">     <span class="keyword">void</span></span><br><span class="line">     _M_range_initialize(_InputIterator __first,</span><br><span class="line">       _InputIterator __last, <span class="built_in">std</span>::input_iterator_tag)<span class="comment">//如果是输入迭代器</span></span><br><span class="line">     &#123;</span><br><span class="line">       <span class="keyword">for</span> (; __first != __last; ++__first)<span class="comment">//只能一个一个数据的添加</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">       emplace_back(*__first);<span class="comment">//采用右移的方式进行插入到末尾</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">       push_back(*__first);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _ForwardIterator&gt;</span><br><span class="line">     <span class="keyword">void</span></span><br><span class="line">     _M_range_initialize(_ForwardIterator __first,</span><br><span class="line">       _ForwardIterator __last, <span class="built_in">std</span>::forward_iterator_tag)<span class="comment">//如果是前向迭代器</span></span><br><span class="line">     &#123;</span><br><span class="line">       <span class="keyword">const</span> size_type __n = <span class="built_in">std</span>::distance(__first, __last);<span class="comment">//计算需要的空间大小</span></span><br><span class="line">       <span class="keyword">this</span>-&gt;_M_impl._M_start = <span class="keyword">this</span>-&gt;_M_allocate(__n);<span class="comment">//一次性分配足够的内存大小</span></span><br><span class="line">       <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = <span class="keyword">this</span>-&gt;_M_impl._M_start + __n;</span><br><span class="line">       <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">       <span class="built_in">std</span>::__uninitialized_copy_a(__first, __last,<span class="comment">//将数据拷贝到相应内存空间并进行初始化</span></span><br><span class="line">       <span class="keyword">this</span>-&gt;_M_impl._M_start, _M_get_Tp_allocator());</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-4-M-fill-initialize"><a href="#3-7-4-M-fill-initialize" class="headerlink" title="3.7.4 _M_fill_initialize"></a>3.7.4 <font id="_M_fill_initialize">_M_fill_initialize</font></h4><p>定义：填充<strong>n个元素到vector，初始化值为</strong>value。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_fill_initialize(size_type __n, <span class="keyword">const</span> value_type&amp; __value)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">  <span class="built_in">std</span>::__uninitialized_fill_n_a(<span class="keyword">this</span>-&gt;_M_impl._M_start, __n, __value,</span><br><span class="line">    _M_get_Tp_allocator());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-5-M-default-initialize"><a href="#3-7-5-M-default-initialize" class="headerlink" title="3.7.5 _M_default_initialize"></a>3.7.5 <font id="_M_default_initialize">_M_default_initialize</font></h4><p>定义：填充__n个元素到vector，初始化为默认值。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_default_initialize(size_type __n)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">  <span class="built_in">std</span>::__uninitialized_default_n_a(<span class="keyword">this</span>-&gt;_M_impl._M_start, __n,</span><br><span class="line">    _M_get_Tp_allocator());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-6-M-assign-dispatch"><a href="#3-7-6-M-assign-dispatch" class="headerlink" title="3.7.6 _M_assign_dispatch"></a>3.7.6 <font id="_M_assign_dispatch">_M_assign_dispatch</font></h4><p>定义：给vector分派数据元素。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Integer&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_assign_dispatch(_Integer __n, _Integer __val, __true_type)</span><br><span class="line">&#123; _M_fill_assign(__n, __val); &#125;<span class="comment">//将__n个值为__val的元素填充vector</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_assign_dispatch(_InputIterator __first, _InputIterator __last,</span><br><span class="line">  __false_type)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;_InputIterator&gt;::</span><br><span class="line">    iterator_category _IterCategory;</span><br><span class="line">  _M_assign_aux(__first, __last, _IterCategory())<span class="comment">//根据迭代器的类型填充vector</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-7-M-assign-aux"><a href="#3-7-7-M-assign-aux" class="headerlink" title="3.7.7 _M_assign_aux"></a>3.7.7 <font id="_M_assign_aux">_M_assign_aux</font></h4><p>定义：将范围内的数据赋值给vector<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line"><span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">_M_assign_aux(_InputIterator __first, _InputIterator __last,</span><br><span class="line">  <span class="built_in">std</span>::input_iterator_tag)<span class="comment">//输入迭代器版本</span></span><br><span class="line">&#123;</span><br><span class="line">  pointer __cur(<span class="keyword">this</span>-&gt;_M_impl._M_start);</span><br><span class="line">  <span class="keyword">for</span> (; __first != __last &amp;&amp; __cur != <span class="keyword">this</span>-&gt;_M_impl._M_finish;</span><br><span class="line">    ++__cur, ++__first)</span><br><span class="line">    *__cur = *__first;</span><br><span class="line">    <span class="keyword">if</span> (__first == __last)<span class="comment">//如果已经将全部数据赋值到vector，则删除原有vector多余的数据</span></span><br><span class="line">      _M_erase_at_end(__cur);</span><br><span class="line">    <span class="keyword">else</span>	<span class="comment">//否则在vector的end()继续插入还未赋值的元素</span></span><br><span class="line">      insert(end(), __first, __last);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _ForwardIterator&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line"><span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">_M_assign_aux(_ForwardIterator __first, _ForwardIterator __last,</span><br><span class="line">  <span class="built_in">std</span>::forward_iterator_tag)<span class="comment">//向前迭代器版本</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">const</span> size_type __len = <span class="built_in">std</span>::distance(__first, __last);<span class="comment">//计算需要的空间大小</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (__len &gt; capacity())<span class="comment">//需要的空间大于原始内存大小</span></span><br><span class="line">  &#123;</span><br><span class="line">    pointer __tmp(_M_allocate_and_copy(__len, __first, __last));<span class="comment">//重新分配空间并进行数据的拷贝</span></span><br><span class="line">    <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">      _M_get_Tp_allocator());<span class="comment">//将原来的空间数据进行资源释放</span></span><br><span class="line">    _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,<span class="comment">//释放原来的内存空间</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage - <span class="keyword">this</span>-&gt;_M_impl._M_start);</span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_start = __tmp;</span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_finish = <span class="keyword">this</span>-&gt;_M_impl._M_start + __len;</span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = <span class="keyword">this</span>-&gt;_M_impl._M_finish;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (size() &gt;= __len)<span class="comment">//原始元素个数大于需要的空间大小，将元素拷贝到vector，并删除多余的原始元素</span></span><br><span class="line">    _M_erase_at_end(<span class="built_in">std</span>::copy(__first, __last, <span class="keyword">this</span>-&gt;_M_impl._M_start));</span><br><span class="line">  <span class="keyword">else</span>	<span class="comment">//需要的空间大于原始元素个数，但小于原始内存大小</span></span><br><span class="line">  &#123;</span><br><span class="line">    _ForwardIterator __mid = __first;<span class="comment">//复制一份需要拷贝的第一个迭代器</span></span><br><span class="line">    <span class="built_in">std</span>::advance(__mid, size());<span class="comment">//复制的迭代器前进size()</span></span><br><span class="line">    <span class="built_in">std</span>::copy(__first, __mid, <span class="keyword">this</span>-&gt;_M_impl._M_start);<span class="comment">//将size()个数据先拷贝到原有元素的内存空间</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">    <span class="built_in">std</span>::__uninitialized_copy_a(__mid, __last,</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">      _M_get_Tp_allocator());<span class="comment">//将剩余的数据进行拷贝并且进行初始化</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-8-M-fill-assign"><a href="#3-7-8-M-fill-assign" class="headerlink" title="3.7.8 _M_fill_assign"></a>3.7.8 <font id="_M_fill_assign">_M_fill_assign</font></h4><p>定义：用<strong>n个值为</strong>val的元素填充vector<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line"><span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">_M_fill_assign(<span class="keyword">size_t</span> __n, <span class="keyword">const</span> value_type&amp; __val)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (__n &gt; capacity())<span class="comment">//原有内存大小不够</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">vector</span> __tmp(__n, __val, _M_get_Tp_allocator());<span class="comment">//用__n和__val直接初始化一个临时vector</span></span><br><span class="line">    __tmp._M_impl._M_swap_data(<span class="keyword">this</span>-&gt;_M_impl);<span class="comment">//与临时vector交换内存空间的指针数据，释放原有空间</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (__n &gt; size())<span class="comment">//原有内存大小足够</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">std</span>::fill(begin(), end(), __val);<span class="comment">//先填充原有已初始化的内存空间</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">      <span class="built_in">std</span>::__uninitialized_fill_n_a(<span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">      __n - size(), __val,<span class="comment">//将剩余元素个数以拷贝初始化的方式填充</span></span><br><span class="line">      _M_get_Tp_allocator());</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span><span class="comment">//原有元素个数大于填充的元素个数</span></span><br><span class="line">    _M_erase_at_end(<span class="built_in">std</span>::fill_n(<span class="keyword">this</span>-&gt;_M_impl._M_start, __n, __val));<span class="comment">//填充并删除多余的原有元素</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-9-M-insert-dispatch"><a href="#3-7-9-M-insert-dispatch" class="headerlink" title="3.7.9 _M_insert_dispatch"></a>3.7.9 <font id="_M_insert_dispatch">_M_insert_dispatch</font></h4><p>定义：在指定位置插入数据<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Integer&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,</span><br><span class="line">  __true_type)<span class="comment">//在__pos插入__n个__val元素</span></span><br><span class="line">&#123; _M_fill_insert(__pos, __n, __val); &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _InputIterator&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line">_M_insert_dispatch(iterator __pos, _InputIterator __first,</span><br><span class="line">  _InputIterator __last, __false_type)</span><br><span class="line">&#123;<span class="comment">//在__pos插入__first到__last的元素</span></span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::iterator_traits&lt;_InputIterator&gt;::</span><br><span class="line">    iterator_category _IterCategory;<span class="comment">//根据_InputIterator的类型调用相应的插入函数</span></span><br><span class="line">  _M_range_insert(__pos, __first, __last, _IterCategory());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-10-M-fill-insert"><a href="#3-7-10-M-fill-insert" class="headerlink" title="3.7.10 _M_fill_insert"></a>3.7.10 <font id="_M_fill_insert">_M_fill_insert</font></h4><p>定义：在指定位置插入<strong>n个值为</strong>x的元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line">  <span class="keyword">void</span></span><br><span class="line">  <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">    _M_fill_insert(iterator __position, size_type __n, <span class="keyword">const</span> value_type&amp; __x)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (__n != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (size_type(<span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">        - <span class="keyword">this</span>-&gt;_M_impl._M_finish) &gt;= __n)<span class="comment">//原有内存空间足够插入的元素个数</span></span><br><span class="line">      &#123;</span><br><span class="line">        value_type __x_copy = __x;</span><br><span class="line">        <span class="keyword">const</span> size_type __elems_after = end() - __position;</span><br><span class="line">        pointer __old_finish(<span class="keyword">this</span>-&gt;_M_impl._M_finish);</span><br><span class="line">        <span class="keyword">if</span> (__elems_after &gt; __n)<span class="comment">//从插入的位置开始，原有的元素空间足够容纳插入的元素个数</span></span><br><span class="line">        &#123;</span><br><span class="line">          <span class="built_in">std</span>::__uninitialized_move_a(<span class="keyword">this</span>-&gt;_M_impl._M_finish - __n,</span><br><span class="line">            <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">            <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">            _M_get_Tp_allocator());<span class="comment">//将后面__n个原有元素移到end()之后</span></span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_finish += __n;</span><br><span class="line">            _GLIBCXX_MOVE_BACKWARD3(__position.base(),</span><br><span class="line">              __old_finish - __n, __old_finish);<span class="comment">//将__old_finish-n到__position的X数据拷贝从__old_finish到__old_finish-X的位置</span></span><br><span class="line">          <span class="built_in">std</span>::fill(__position.base(), __position.base() + __n,</span><br><span class="line">            _x_copy);<span class="comment">//将__n个_x元素填充到__position</span></span><br><span class="line">    &#125;</span><br><span class="line">      <span class="keyword">else</span><span class="comment">//从插入的位置开始，原有的元素空间不够容纳插入的元素个数</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">          <span class="built_in">std</span>::__uninitialized_fill_n_a(<span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">          __n - __elems_after,</span><br><span class="line">          __x_copy, _M_get_Tp_allocator());<span class="comment">//将大于原来元素空间大小的元素填充到end()</span></span><br><span class="line">        <span class="built_in">std</span>::__uninitialized_move_a(__position.base(), __old_finish,</span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">          _M_get_Tp_allocator());<span class="comment">//用move的方式将__position到旧的end()之间的原有元素移到新的end()</span></span><br><span class="line">        <span class="keyword">this</span>-&gt;_M_impl._M_finish += __elems_after;</span><br><span class="line">        <span class="built_in">std</span>::fill(__position.base(), __old_finish, __x_copy);<span class="comment">//将__positon到旧的end()之间的空间用__x进行填充</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span><span class="comment">//原有内存空间不够</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">const</span> size_type __len =</span><br><span class="line">      _M_check_len(__n, <span class="string">"vector::_M_fill_insert"</span>);<span class="comment">//重新计算需要的内存大小</span></span><br><span class="line">    <span class="keyword">const</span> size_type __elems_before = __position - begin();</span><br><span class="line">    pointer __new_start(<span class="keyword">this</span>-&gt;_M_allocate(__len));<span class="comment">//重新分配足够的内存空间</span></span><br><span class="line">    pointer __new_finish(__new_start);</span><br><span class="line">    __try</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">std</span>::__uninitialized_fill_n_a(__new_start + __elems_before,</span><br><span class="line">        __n, __x, _M_get_Tp_allocator());<span class="comment">//将__n个值为__x的元素先填充到指定位置</span></span><br><span class="line">      __new_finish = pointer();</span><br><span class="line"></span><br><span class="line">      __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line">        (<span class="keyword">this</span>-&gt;_M_impl._M_start, __position.base(),</span><br><span class="line">        __new_start, _M_get_Tp_allocator());<span class="comment">//将__position之前的旧元素移到新的内存空间</span></span><br><span class="line"></span><br><span class="line">      __new_finish += __n;</span><br><span class="line"></span><br><span class="line">      __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line"> </span><br><span class="line">   (__position.base(), <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">        __new_finish, _M_get_Tp_allocator());<span class="comment">//将__position到原来end()的旧元素移到新的内存空间</span></span><br><span class="line">    &#125;</span><br><span class="line">    __catch(...)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> (!__new_finish)</span><br><span class="line">        <span class="built_in">std</span>::_Destroy(__new_start + __elems_before,</span><br><span class="line">          __new_start + __elems_before + __n, _M_get_Tp_allocator());</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">std</span>::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());</span><br><span class="line">      _M_deallocate(__new_start, __len);</span><br><span class="line">      __throw_exception_again;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">      _M_get_Tp_allocator());<span class="comment">//释放原有的元素资源</span></span><br><span class="line">    _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage - <span class="keyword">this</span>-&gt;_M_impl._M_start);<span class="comment">//释放原有的内存空间</span></span><br><span class="line">   <span class="keyword">this</span>-&gt;_M_impl._M_start = __new_start;</span><br><span class="line">   <span class="keyword">this</span>-&gt;_M_impl._M_finish = __new_finish;</span><br><span class="line">   <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = __new_start + __len;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><font color="red" size="2">_GLIBCXX_MOVE_BACKWARD3</font><font>：定义在bits/stl_algobase.h</font></p>
+<h4 id="3-7-11-M-default-append"><a href="#3-7-11-M-default-append" class="headerlink" title="3.7.11 _M_default_append"></a>3.7.11 <font id="_M_default_append">_M_default_append</font></h4><p>定义：在vector末尾添加__n个元素。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line"><span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">_M_default_append(size_type __n)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (__n != <span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (size_type(<span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">      - <span class="keyword">this</span>-&gt;_M_impl._M_finish) &gt;= __n)<span class="comment">//原有内存空间足够容纳添加的__n个元素</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_finish =</span><br><span class="line">        <span class="built_in">std</span>::__uninitialized_default_n_a(<span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">        __n, _M_get_Tp_allocator());<span class="comment">//直接进行初始化</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span><span class="comment">//空间大小不够</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">const</span> size_type __len =</span><br><span class="line">        _M_check_len(__n, <span class="string">"vector::_M_default_append"</span>);<span class="comment">//重新计算需要的内存大小</span></span><br><span class="line">      <span class="keyword">const</span> size_type __old_size = <span class="keyword">this</span>-&gt;size();</span><br><span class="line">      pointer __new_start(<span class="keyword">this</span>-&gt;_M_allocate(__len));<span class="comment">//重新分配内存空间</span></span><br><span class="line">      pointer __new_finish(__new_start);</span><br><span class="line">      __try</span><br><span class="line">      &#123;</span><br><span class="line">        __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line">          (<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">          __new_start, _M_get_Tp_allocator());<span class="comment">//将原来的元素移动到新的内存空间</span></span><br><span class="line">        __new_finish = <span class="built_in">std</span>::__uninitialized_default_n_a(__new_finish, __n,</span><br><span class="line">        _M_get_Tp_allocator());<span class="comment">//在新的内存空间end()添加__n个元素</span></span><br><span class="line">      &#125;</span><br><span class="line">      __catch(...)</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">std</span>::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());</span><br><span class="line">        _M_deallocate(__new_start, __len);</span><br><span class="line">        __throw_exception_again;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">        _M_get_Tp_allocator());<span class="comment">//释放原有元素的资源</span></span><br><span class="line">      _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">        - <span class="keyword">this</span>-&gt;_M_impl._M_start);<span class="comment">//释放原有的内存空间</span></span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_start = __new_start;</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_finish = __new_finish;</span><br><span class="line">      <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = __new_start + __len;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-12-M-insert-aux"><a href="#3-7-12-M-insert-aux" class="headerlink" title="3.7.12 _M_insert_aux"></a>3.7.12 <font id="_M_insert_aux">_M_insert_aux</font></h4><p>定义：在指定位置插入元素。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span>... _Args&gt;</span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">        _M_insert_aux(iterator __position, _Args&amp;&amp;... __args)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line">      <span class="keyword">void</span></span><br><span class="line">      <span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::</span><br><span class="line">        _M_insert_aux(iterator __position, <span class="keyword">const</span> _Tp&amp; __x)</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;_M_impl._M_finish != <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage)</span><br><span class="line">        &#123;</span><br><span class="line">          _Alloc_traits::construct(<span class="keyword">this</span>-&gt;_M_impl, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">            _GLIBCXX_MOVE(*(<span class="keyword">this</span>-&gt;_M_impl._M_finish</span><br><span class="line">            - <span class="number">1</span>)));<span class="comment">//将最后一个元素移到end()的位置，并进行初始化</span></span><br><span class="line">          ++<span class="keyword">this</span>-&gt;_M_impl._M_finish;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &lt; 201103L</span></span><br><span class="line">          _Tp __x_copy = __x;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">          _GLIBCXX_MOVE_BACKWARD3(__position.base(), <span class="keyword">this</span>-&gt;_M_impl._M_finish - <span class="number">2</span>,</span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_finish - <span class="number">1</span>);<span class="comment">//将__position到最后一个元素之前的元素一次往后移一格</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &lt; 201103L</span></span><br><span class="line">          *__position = __x_copy;<span class="comment">//将插入的元素赋值到__position</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">          *__position = _Tp(<span class="built_in">std</span>::forward&lt;_Args&gt;(__args)...);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span><span class="comment">//原有的内存空间不够</span></span><br><span class="line">        &#123;</span><br><span class="line">          <span class="keyword">const</span> size_type __len =</span><br><span class="line">            _M_check_len(size_type(<span class="number">1</span>), <span class="string">"vector::_M_insert_aux"</span>);<span class="comment">//计算需要的内存大小</span></span><br><span class="line">          <span class="keyword">const</span> size_type __elems_before = __position - begin();</span><br><span class="line">          pointer __new_start(<span class="keyword">this</span>-&gt;_M_allocate(__len));<span class="comment">//分配新的内存空间</span></span><br><span class="line">          pointer __new_finish(__new_start);</span><br><span class="line">          __try</span><br><span class="line">          &#123;</span><br><span class="line">            _Alloc_traits::construct(<span class="keyword">this</span>-&gt;_M_impl, __new_start + __elems_before,</span><br><span class="line">#<span class="keyword">if</span> __cplusplus &gt;= <span class="number">201103L</span></span><br><span class="line">              <span class="built_in">std</span>::forward&lt;_Args&gt;(__args)...);<span class="comment">//用插入的元素对插入的位置进行初始化</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">              __x);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">            __new_finish = pointer();</span><br><span class="line"></span><br><span class="line">            __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line">              (<span class="keyword">this</span>-&gt;_M_impl._M_start, __position.base(),</span><br><span class="line">              __new_start, _M_get_Tp_allocator());<span class="comment">//将原有前半部分的元素移动到新的内存空间</span></span><br><span class="line"></span><br><span class="line">            ++__new_finish;</span><br><span class="line"></span><br><span class="line">            __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line">              (__position.base(), <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">              __new_finish, _M_get_Tp_allocator());<span class="comment">//将原有后半部分的元素移动到新的内存空间</span></span><br><span class="line">          &#125;</span><br><span class="line">          __catch(...)</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="keyword">if</span> (!__new_finish)</span><br><span class="line">              _Alloc_traits::destroy(<span class="keyword">this</span>-&gt;_M_impl,</span><br><span class="line">                __new_start + __elems_before);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">              <span class="built_in">std</span>::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());</span><br><span class="line">            _M_deallocate(__new_start, __len);</span><br><span class="line">            __throw_exception_again;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">            _M_get_Tp_allocator());<span class="comment">//释放原有元素资源</span></span><br><span class="line">          _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start,</span><br><span class="line">            <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">            - <span class="keyword">this</span>-&gt;_M_impl._M_start);<span class="comment">//释放原有内存空间</span></span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_start = __new_start;</span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_finish = __new_finish;</span><br><span class="line">          <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = __new_start + __len;</span><br><span class="line">        &#125;</span><br><span class="line">      </span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-13-M-emplace-back-aux"><a href="#3-7-13-M-emplace-back-aux" class="headerlink" title="3.7.13 _M_emplace_back_aux"></a>3.7.13 <font id="_M_emplace_back_aux">_M_emplace_back_aux</font></h4><p>定义：针对内存不够的情况，用move的方式在后面插入元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... _Args&gt;</span><br><span class="line"><span class="keyword">void</span></span><br><span class="line"><span class="built_in">vector</span>&lt;_Tp, _Alloc&gt;::_M_emplace_back_aux(_Args&amp;&amp;... __args)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">const</span> size_type __len =</span><br><span class="line">  _M_check_len(size_type(<span class="number">1</span>), <span class="string">"vector::_M_emplace_back_aux"</span>);<span class="comment">//计算需要的内存大小</span></span><br><span class="line">  pointer __new_start(<span class="keyword">this</span>-&gt;_M_allocate(__len));<span class="comment">//重新分配内存空间</span></span><br><span class="line">  pointer __new_finish(__new_start);</span><br><span class="line">  __try</span><br><span class="line">  &#123;</span><br><span class="line">    _Alloc_traits::construct(<span class="keyword">this</span>-&gt;_M_impl, __new_start + size(),</span><br><span class="line">      <span class="built_in">std</span>::forward&lt;_Args&gt;(__args)...);<span class="comment">//在新内存末尾初始化新的元素</span></span><br><span class="line">    __new_finish = pointer();</span><br><span class="line"></span><br><span class="line">    __new_finish = <span class="built_in">std</span>::__uninitialized_move_if_noexcept_a</span><br><span class="line">      (<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">      __new_start, _M_get_Tp_allocator());<span class="comment">//将原有元素用move的方式移到新的内存空间</span></span><br><span class="line"></span><br><span class="line">    ++__new_finish;</span><br><span class="line">  &#125;</span><br><span class="line">  __catch(...)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> (!__new_finish)</span><br><span class="line">      _Alloc_traits::destroy(<span class="keyword">this</span>-&gt;_M_impl, __new_start + size());</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="built_in">std</span>::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());</span><br><span class="line">    _M_deallocate(__new_start, __len);</span><br><span class="line">    __throw_exception_again;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">std</span>::_Destroy(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_finish,</span><br><span class="line">    _M_get_Tp_allocator());<span class="comment">//释放原有元素资源</span></span><br><span class="line">  _M_deallocate(<span class="keyword">this</span>-&gt;_M_impl._M_start, <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage</span><br><span class="line">    - <span class="keyword">this</span>-&gt;_M_impl._M_start);<span class="comment">//释放原有内存空间</span></span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_start = __new_start;</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_finish = __new_finish;</span><br><span class="line">  <span class="keyword">this</span>-&gt;_M_impl._M_end_of_storage = __new_start + __len;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="3-7-14-M-erase"><a href="#3-7-14-M-erase" class="headerlink" title="3.7.14 _M_erase"></a>3.7.14 <font id="_M_erase">_M_erase</font></h4><p>定义：删除指定位置的元素<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">typename</span> <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, _Alloc&gt;::iterator</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, _Alloc&gt;::</span><br><span class="line">_M_erase(iterator __position)<span class="comment">//删除一个位置的元素</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (__position + <span class="number">1</span> != end())</span><br><span class="line">    <span class="built_in">std</span>::copy(__position + <span class="number">1</span>, end(), __position);<span class="comment">//将指定位置之后的元素往前移一格，由于覆盖的时候那一个元素已被释放，所以无需再调用释放函数</span></span><br><span class="line">  --<span class="keyword">this</span>-&gt;_M_impl._M_finish;<span class="comment">//将最后一个位置往前移一格</span></span><br><span class="line">  <span class="keyword">return</span> __position;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="keyword">typename</span> <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, _Alloc&gt;::iterator</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">bool</span>, _Alloc&gt;::</span><br><span class="line">  _M_erase(iterator __first, iterator __last)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (__first != __last)</span><br><span class="line">    _M_erase_at_end(<span class="built_in">std</span>::copy(__last, end(), __first));<span class="comment">//将删除区间后面的元素往前移，并释放拷贝之后末尾的元素，</span></span><br><span class="line">  <span class="keyword">return</span> __first;<span class="comment">//由于往前覆盖的时候不一定会覆盖前面所有的元素，从而无法全部释放那些元素，所有需要调用删除函数进行释放。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+	
+	
+		<div>
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+		</div>
+	
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gcc/" rel="tag"><i class="fa fa-tag"></i> gcc</a>
+          
+            <a href="/tags/stl/" rel="tag"><i class="fa fa-tag"></i> stl</a>
+          
+            <a href="/tags/vector/" rel="tag"><i class="fa fa-tag"></i> vector</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/20/stl之内存分配器/" rel="next" title="stl之内存分配器">
+                <i class="fa fa-chevron-left"></i> stl之内存分配器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/20/gcc各种宏解释/" rel="prev" title="gcc各种宏解释">
+                gcc各种宏解释 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="Zhouxj25">
+            
+              <p class="site-author-name" itemprop="name">Zhouxj25</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zhouxj25" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zhouxj25@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备"><span class="nav-text">1. 准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-源码版本"><span class="nav-text">1.1 源码版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-文件目录"><span class="nav-text">1.2 文件目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-类关系概述"><span class="nav-text">2. 类关系概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-类关系UML图"><span class="nav-text">2.1 类关系UML图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-类概述"><span class="nav-text">2.2 类概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-Vector-base"><span class="nav-text">2.2.1 _Vector_base</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-Vector-impl"><span class="nav-text">2.2.2 _Vector_impl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-vector"><span class="nav-text">2.2.4 vector</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-vector部分成员函数详解"><span class="nav-text">3. vector部分成员函数详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-构造函数解析"><span class="nav-text">3.1 构造函数解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-赋值操作符operator"><span class="nav-text">3.2 赋值操作符operator=</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-左值赋值"><span class="nav-text">3.2.1 左值赋值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-右值赋值"><span class="nav-text">3.2.2 右值赋值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-分派函数assign"><span class="nav-text">3.3 分派函数assign</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-重设元素个数函数resize"><span class="nav-text">3.4 重设元素个数函数resize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-后面添加元素函数push-back"><span class="nav-text">3.5 后面添加元素函数push_back</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-插入函数insert"><span class="nav-text">3.6 插入函数insert</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-内部函数的解析"><span class="nav-text">3.7 内部函数的解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-1-M-allocate-and-copy"><span class="nav-text">3.7.1 _M_allocate_and_copy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-2-M-initialize-dispatch"><span class="nav-text">3.7.2 _M_initialize_dispatch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-3-M-range-initialize"><span class="nav-text">3.7.3 _M_range_initialize</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-4-M-fill-initialize"><span class="nav-text">3.7.4 _M_fill_initialize</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-5-M-default-initialize"><span class="nav-text">3.7.5 _M_default_initialize</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-6-M-assign-dispatch"><span class="nav-text">3.7.6 _M_assign_dispatch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-7-M-assign-aux"><span class="nav-text">3.7.7 _M_assign_aux</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-8-M-fill-assign"><span class="nav-text">3.7.8 _M_fill_assign</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-9-M-insert-dispatch"><span class="nav-text">3.7.9 _M_insert_dispatch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-10-M-fill-insert"><span class="nav-text">3.7.10 _M_fill_insert</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-11-M-default-append"><span class="nav-text">3.7.11 _M_default_append</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-12-M-insert-aux"><span class="nav-text">3.7.12 _M_insert_aux</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-13-M-emplace-back-aux"><span class="nav-text">3.7.13 _M_emplace_back_aux</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-7-14-M-erase"><span class="nav-text">3.7.14 _M_erase</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhouxj25</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

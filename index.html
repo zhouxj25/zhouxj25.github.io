@@ -506,6 +506,7 @@
 <h3 id="1-2-文件目录"><a href="#1-2-文件目录" class="headerlink" title="1.2 文件目录"></a>1.2 文件目录</h3><blockquote>
 <p>gcc-6.3\libstdc++-v3\include\bits\stl_vector.h<br>gcc-6.3\libstdc++-v3\include\bits\vector.tcc</p>
 </blockquote>
+<h2 id="2-类关系概述"><a href="#2-类关系概述" class="headerlink" title="2. 类关系概述"></a>2. 类关系概述</h2><h3 id="2-1-类关系UML图"><a href="#2-1-类关系UML图" class="headerlink" title="2.1 类关系UML图"></a>2.1 类关系UML图</h3><img src="http://www.plantuml.com/plantuml/svg/ROz1JiCm44NNv1IZLa8fj55tbL3eiZjM8BRMr9cc8naxiaULeFGad88r4hT1N0EdRgAcOZV-__tlcISMGp3QaHRdVp-_VZw-HvbwFZxL6WC1tCncq2dyqXYu0-si8DkG3T7oFQAfAikqmH26mRA4_74wNgqMY_by0ilb9NLisMTNj-eX9SxZKMuSMo4FqKPZd4QXFF0RAPb4T-UuQgsAUlCKc4977VxRQp-i3e9UXjA6BOVjK2DRARU9jFDOKz-SxZzsfl4QN4CUutIVzsj6ackR5qNHIYm9W3NLR5jgt1tJdQ8mVgTTythAz43SJ1XDUr_5eK7Hsql4ewtf34p-uGy0">
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/01/24/stl之vector源码分析/#more" rel="contents">
@@ -561,7 +562,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2017/01/20/stl之内存分配器/">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2017/01/20/stl之空间适配器allocator/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zhouxj25">
@@ -580,7 +581,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/20/stl之内存分配器/" itemprop="url">stl之内存分配器</a></h1>
+                <a class="post-title-link" href="/2017/01/20/stl之空间适配器allocator/" itemprop="url">stl之空间适配器allocator</a></h1>
         
 
         <div class="post-meta">
@@ -653,19 +654,19 @@
 
       
         
-          
-          
-          
+          <h2 id="1-allocator说明"><a href="#1-allocator说明" class="headerlink" title="1. allocator说明"></a>1. allocator说明</h2><p>  allocator封装了空间的分配和释放的接口，所有可能需要分配和释放内存的标准库组件，如string、vector、shared_ptr，都通过allocator进行，分配与释放以及对象的构造与析构等实现由具体的XX_allocator实现。</p>
+<h2 id="2-allocator关系图"><a href="#2-allocator关系图" class="headerlink" title="2. allocator关系图"></a>2. allocator关系图</h2><img src="http://www.plantuml.com/plantuml/svg/Iyv9B2vMICp9oKzEBCaliYdBpqonKwZcgkLAHfCfgIn8pKlCJLM83mb0LX4V3rSJdvHOd8f58HUw6WMR6brTXDa0">
+<p>__allocator_base&lt;_Tp&gt;定义在编译后的c++allocator.h文件中，定义如下：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/20/stl之内存分配器/#more" rel="contents">
+            <a class="btn" href="/2017/01/20/stl之空间适配器allocator/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
           <!--/noindex-->
         
       
-    </div>
+    </p></div>
     
     
     
@@ -807,6 +808,9 @@
 <p>Ubuntu 14.04</p>
 </blockquote>
 <h3 id="1-2-获取GCC源码包"><a href="#1-2-获取GCC源码包" class="headerlink" title="1.2. 获取GCC源码包"></a>1.2. 获取GCC源码包</h3><p>可以直接在这里<a href="https://ftp.gnu.org/gnu/gcc/" target="_blank" rel="noopener">下载</a>，或者通过命令获取:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@root:/home<span class="comment"># wget https://ftp.gnu.org/gnu/gcc/gcc-6.3.0/gcc-6.3.0.tar.gz</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="1-3-准备编译环境"><a href="#1-3-准备编译环境" class="headerlink" title="1.3. 准备编译环境"></a>1.3. 准备编译环境</h3><p>系统可能会缺少以下依赖的开发包，通过以下命令安装:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install libgmp-dev libmpfr-dev libmpc-dev</span><br></pre></td></tr></table></figure></p>
+<p>或者分别下载进行编译安装:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://ftp.gnu.org/pub/gnu/gmp/gmp-6.1.2.tar.xz</span><br><span class="line">wget https://ftp.gnu.org/pub/gnu/mpfr/mpfr-4.0.0.tar.xz </span><br><span class="line">wget https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz</span><br></pre></td></tr></table></figure></p>
+<p>设置编译选项<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> CFLAGS=<span class="string">"-g3 -O0"</span> CPPFLAGS=<span class="string">"-g3 -O0"</span> CXXFLAGS=<span class="string">"-g3 -O0"</span></span><br></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/01/07/编译调试gcc源码/#more" rel="contents">
@@ -919,7 +923,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>

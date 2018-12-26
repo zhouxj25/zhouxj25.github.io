@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="stl,c++,allocator,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 定义allocator_traits类模板提供访问空间适配器（allocator）各种属性的标准方法，标准容器和其它标准库组件通过此模板访问适配器，这使得能以任何类类型为适配器，只要用户提供的allocator_traits特化实现所有要求的功能。allocator_traits与allocator分开实现。其实是Adapter设计模式。allocator_traits可以搭配任何类型的al">
+<meta name="keywords" content="stl,c++,allocator">
+<meta property="og:type" content="article">
+<meta property="og:title" content="stl之allocator_traits">
+<meta property="og:url" content="https://zhouxj25.github.io/2017/01/22/工作/stl之allocator_traits/index.html">
+<meta property="og:site_name" content="Zhouxj25&#39;s Blog">
+<meta property="og:description" content="1. 定义allocator_traits类模板提供访问空间适配器（allocator）各种属性的标准方法，标准容器和其它标准库组件通过此模板访问适配器，这使得能以任何类类型为适配器，只要用户提供的allocator_traits特化实现所有要求的功能。allocator_traits与allocator分开实现。其实是Adapter设计模式。allocator_traits可以搭配任何类型的al">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://www.plantuml.com/plantuml/svg/TO_R2OKm38RVCqKMi1E8S2O9iHOvKAkO28gwkpSeMFKr_-rBuCP9nzQXQ8Kp85hF8aZ4thUMjUr9U_whKCdYSfqw5_OCqk_GYpEonbWQ-lAl224k4zLX83kEp_rdJT83i7ER3rhCbomx7ZEf36_7onvfp9q1DW00">
+<meta property="og:updated_time" content="2018-12-22T10:32:44.393Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="stl之allocator_traits">
+<meta name="twitter:description" content="1. 定义allocator_traits类模板提供访问空间适配器（allocator）各种属性的标准方法，标准容器和其它标准库组件通过此模板访问适配器，这使得能以任何类类型为适配器，只要用户提供的allocator_traits特化实现所有要求的功能。allocator_traits与allocator分开实现。其实是Adapter设计模式。allocator_traits可以搭配任何类型的al">
+<meta name="twitter:image" content="http://www.plantuml.com/plantuml/svg/TO_R2OKm38RVCqKMi1E8S2O9iHOvKAkO28gwkpSeMFKr_-rBuCP9nzQXQ8Kp85hF8aZ4thUMjUr9U_whKCdYSfqw5_OCqk_GYpEonbWQ-lAl224k4zLX83kEp_rdJT83i7ER3rhCbomx7ZEf36_7onvfp9q1DW00">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhouxj25.github.io/2017/01/22/工作/stl之allocator_traits/">
+
+
+
+
+
+  <title>stl之allocator_traits | Zhouxj25's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zhouxj25's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">每天都有收获的感觉真爽！！！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2017/01/22/工作/stl之allocator_traits/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zhouxj25">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhouxj25's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">stl之allocator_traits</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T20:30:00+08:00">
+                2017-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/blog/" itemprop="url" rel="index">
+                    <span itemprop="name">blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-定义"><a href="#1-定义" class="headerlink" title="1. 定义"></a>1. 定义</h2><p>allocator_traits类模板提供访问空间适配器（allocator）各种属性的标准方法，标准容器和其它标准库组件通过此模板访问适配器，这使得能以任何类类型为适配器，只要用户提供的allocator_traits特化实现所有要求的功能。allocator_traits与allocator分开实现。其实是<br><a href="https://en.wikipedia.org/wiki/Adapter_pattern" target="_blank" rel="noopener">Adapter</a>设计模式。allocator_traits可以搭配任何类型的allocator来进行内存的管理，用户也可以实现自己的allocator，而不用自己去实现allocator_traits。</p>
+<h2 id="2-关系图"><a href="#2-关系图" class="headerlink" title="2. 关系图"></a>2. 关系图</h2><img src="http://www.plantuml.com/plantuml/svg/TO_R2OKm38RVCqKMi1E8S2O9iHOvKAkO28gwkpSeMFKr_-rBuCP9nzQXQ8Kp85hF8aZ4thUMjUr9U_whKCdYSfqw5_OCqk_GYpEonbWQ-lAl224k4zLX83kEp_rdJT83i7ER3rhCbomx7ZEf36_7onvfp9q1DW00">
+<a id="more"></a>
+<h2 id="3-allocator-traits-base解析"><a href="#3-allocator-traits-base解析" class="headerlink" title="3.__allocator_traits_base解析"></a>3.__allocator_traits_base解析</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">allocator_traits_base</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="comment">/*对空间适配器_Tp的各成员声明类型别名*/</span></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc, <span class="keyword">typename</span> _Up&gt;</span><br><span class="line">    <span class="keyword">using</span> __rebind = <span class="keyword">typename</span> _Alloc::<span class="keyword">template</span> rebind&lt;_Up&gt;::other;<span class="comment">//由于rebind是_Alloc的模板结构体，  </span></span><br><span class="line">    <span class="comment">//所以需要使用_Alloc::template来做前缀，typename是指明rebind&lt;_Up&gt;::other是个类型，using是指明一个别名。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __pointer = <span class="keyword">typename</span> _Tp::pointer;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __c_pointer = <span class="keyword">typename</span> _Tp::const_pointer;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __v_pointer = <span class="keyword">typename</span> _Tp::void_pointer;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __cv_pointer = <span class="keyword">typename</span> _Tp::const_void_pointer;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __diff_type = <span class="keyword">typename</span> _Tp::difference_type;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __size_type = <span class="keyword">typename</span> _Tp::size_type;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __pocca = <span class="keyword">typename</span> _Tp::propagate_on_container_copy_assignment;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __pocma = <span class="keyword">typename</span> _Tp::propagate_on_container_move_assignment;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __pocs = <span class="keyword">typename</span> _Tp::propagate_on_container_swap;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> __equal = <span class="keyword">typename</span> _Tp::is_always_equal;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>1、using与typedef都可以声明类型的别名，但在C++11标准以后对于模板类型别名声明有了一点区别，可参考<a href="https://en.cppreference.com/w/cpp/language/type_alias" target="_blank" rel="noopener">Type alias, alias template</a>、<a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1489.pdf" target="_blank" rel="noopener">Template aliases for C++</a>。<br>2、以下四个类型只能取值std::true_type或std::false_type，网上也有人将前三个名称缩写为POCCA, POCMA and POCS，这四个指明了容器在执行相应操作时怎么处理容器的allocator，他们只提供编译时检查，而不是运行时检查。<br>● propagate_on_container_copy_assignment：如果是true_type，当容器在执行拷贝赋值(operator=(vector &amp;v))时，allocator也要被拷贝。注意：如果原allocator和新的allocator不同，需要用原allocator释放原来的内存，然后再用新的allocator进行拷贝操作。<br>● propagate_on_container_move_assignment：如果是true_type，当容器在执行move赋值操作(operator=(vector &amp;&amp;v))时，allocator也要执行move操作。注意：如果是false_type，并且原和目的allocator不相等，则需要对元素进行一个一个的move操作，如果有需要的话要resize内存大小。<br>● propagate_on_container_swap：如果是true_type，当容器执行swap操作时，两个容器的allocator也要执行swap操作，如果是false_type，并且两个容器的allocator不相等，则container的swap行为是undefined的。<br>● is_always_equal：如果是true_type，_Tp类型的两个allocator永远相等，如果_Tp没有提供is_always_equal的定义，则返回is_empty&lt;_Tp&gt;::type，即_Tp是否为<a href="#is_empty">is_empty</a>类型。</p>
+<h2 id="4-allocator-traits解析"><a href="#4-allocator-traits解析" class="headerlink" title="4. allocator_traits解析"></a>4. allocator_traits解析</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">allocator_traits</span> :</span> __allocator_traits_base</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">typedef</span> _Alloc allocator_type;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Alloc::value_type value_type;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果_Alloc没有定义pointer则pointer=value_type*,否则pointer=_Alloc::pointer。</span></span><br><span class="line">  <span class="keyword">using</span> pointer = <span class="keyword">__detected_or_t</span>&lt;value_type*, __pointer, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果_Alloc没有定义const_pointer，则const_pointer=const _Alloc::value_type*，否则const_pointer=_Alloc::const_pointer。</span></span><br><span class="line">  <span class="keyword">using</span> const_pointer</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;__ptr_rebind&lt;pointer, <span class="keyword">const</span> value_type&gt;,</span><br><span class="line">    __c_pointer, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> void_pointer</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;__ptr_rebind&lt;pointer, <span class="keyword">void</span>&gt;, __v_pointer, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> const_void_pointer</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;__ptr_rebind&lt;pointer, <span class="keyword">const</span> <span class="keyword">void</span>&gt;, __cv_pointer,</span><br><span class="line">    _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> difference_type</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;<span class="keyword">typename</span> pointer_traits&lt;pointer&gt;::difference_type,</span><br><span class="line">    __diff_type, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果_Alloc没有定义size_type，则根据difference_type定义合适的unsigned integer type</span></span><br><span class="line">  <span class="keyword">using</span> size_type</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;<span class="keyword">typename</span> make_unsigned&lt;difference_type&gt;::type,</span><br><span class="line">    __size_type, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//如果_Alloc没有定义propagate_on_container_copy_assignment，则本propagate_on_container_copy_assignment为false_type。</span></span><br><span class="line">  <span class="keyword">using</span> propagate_on_container_copy_assignment</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;false_type, __pocca, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> propagate_on_container_move_assignment</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;false_type, __pocma, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> propagate_on_container_swap</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;false_type, __pocs, _Alloc&gt;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//如果_Alloc没有定义is_always_equal，则根据_Alloc是否为empty类型，返回true_type或false_type。关于类型是否为empty，下面有给出定义：</span></span><br><span class="line">  <span class="keyword">using</span> is_always_equal</span><br><span class="line">    = <span class="keyword">__detected_or_t</span>&lt;<span class="keyword">typename</span> is_empty&lt;_Alloc&gt;::type, __equal, _Alloc&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> rebind_alloc = __alloc_rebind&lt;_Alloc, _Tp&gt;;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="keyword">using</span> rebind_traits = allocator_traits&lt;rebind_alloc&lt;_Tp&gt;&gt;;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//如果rebind_alloc&lt;value_type&gt;与__undefined相同，则编译时出错。即：_Alloc没有定义rebind，则报错。</span></span><br><span class="line">  <span class="keyword">static_assert</span>(!is_same&lt;rebind_alloc&lt;value_type&gt;, __undefined&gt;::value,</span><br><span class="line">      <span class="string">"allocator defines rebind or is like Alloc&lt;T, Args&gt;"</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc2&gt;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">auto</span></span><br><span class="line">    _S_allocate(_Alloc2&amp; __a, size_type __n, const_void_pointer __hint, <span class="keyword">int</span>)</span><br><span class="line">    -&gt; <span class="keyword">decltype</span>(__a.allocate(__n, __hint))<span class="comment">//返回值类型依赖于模板形参</span></span><br><span class="line">    &#123; <span class="keyword">return</span> __a.allocate(__n, __hint); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc2&gt;</span><br><span class="line">    <span class="keyword">static</span> pointer</span><br><span class="line">    _S_allocate(_Alloc2&amp; __a, size_type __n, const_void_pointer, ...)</span><br><span class="line">    &#123; <span class="keyword">return</span> __a.allocate(__n); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span>... _Args&gt;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> __<span class="title">construct_helper</span></span></span><br><span class="line"><span class="class">    &#123;</span></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc2,</span><br><span class="line">        <span class="keyword">typename</span> = <span class="keyword">decltype</span>(<span class="built_in">std</span>::declval&lt;_Alloc2*&gt;()-&gt;construct(</span><br><span class="line">              <span class="built_in">std</span>::declval&lt;_Tp*&gt;(), <span class="built_in">std</span>::declval&lt;_Args&gt;()...))&gt; <span class="comment">//如果_Alloc2*有成员为_Tp*与_Args为参数的构造函数，则这个模板有类型有效，定义的_test返回值为true_type</span></span><br><span class="line">          <span class="keyword">static</span> true_type __test(<span class="keyword">int</span>);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</span><br><span class="line">        <span class="keyword">static</span> false_type __test(...);<span class="comment">//否则为false_type</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">using</span> type = <span class="keyword">decltype</span>(__test&lt;_Alloc&gt;(<span class="number">0</span>));</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, <span class="keyword">typename</span>... _Args&gt;</span><br><span class="line">    <span class="keyword">using</span> __has_construct</span><br><span class="line">    = <span class="keyword">typename</span> __construct_helper&lt;_Tp, _Args...&gt;::type; <span class="comment">//有无相应类型的构造函数</span></span><br><span class="line"></span><br><span class="line">  ......</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>declval的定义可以参考：<a href="https://zh.cppreference.com/w/cpp/utility/declval" target="_blank" rel="noopener">std::declval</a>。<br>decltype的定义可以参考：<a href="https://zh.cppreference.com/w/cpp/language/decltype" target="_blank" rel="noopener">decltype</a>。<br>__detected_or_t：定义在bits/type_traits文件。<br>is_empty、make_unsigned、pointer_traits、__ptr_rebind：定义在bits/type_traits文件。</p>
+<h2 id="5-alloc-traits解析"><a href="#5-alloc-traits解析" class="headerlink" title="5. __alloc_traits解析"></a>5. __alloc_traits解析</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Alloc&gt;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">alloc_traits</span></span></span><br><span class="line"><span class="class">#<span class="title">if</span> __<span class="title">cplusplus</span> &gt;= 201103<span class="title">L</span></span></span><br><span class="line"><span class="class">:</span> <span class="built_in">std</span>::allocator_traits&lt;_Alloc&gt;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#123; <span class="comment">//定义基类allocator_traits的类型别名</span></span><br><span class="line">  <span class="keyword">typedef</span> _Alloc allocator_type;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> __cplusplus &gt;= 201103L</span></span><br><span class="line">  <span class="keyword">typedef</span> <span class="built_in">std</span>::allocator_traits&lt;_Alloc&gt;           _Base_type;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::value_type         value_type;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::pointer            pointer;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::const_pointer      const_pointer;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::size_type          size_type;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::difference_type    difference_type;</span><br><span class="line">  <span class="comment">//定义基类未定义的引用以及const引用类型</span></span><br><span class="line">  <span class="keyword">typedef</span> value_type&amp;                             reference;</span><br><span class="line">  <span class="keyword">typedef</span> <span class="keyword">const</span> value_type&amp;                       const_reference;</span><br><span class="line">  <span class="keyword">using</span> _Base_type::allocate;</span><br><span class="line">  <span class="keyword">using</span> _Base_type::deallocate;</span><br><span class="line">  <span class="keyword">using</span> _Base_type::construct;</span><br><span class="line">  <span class="keyword">using</span> _Base_type::destroy;</span><br><span class="line">  <span class="keyword">using</span> _Base_type::max_size;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Ptr&gt;</span><br><span class="line">    <span class="keyword">using</span> __is_custom_pointer   <span class="comment">//定义用户类型的指针</span></span><br><span class="line">    = <span class="built_in">std</span>::__and_&lt;<span class="built_in">std</span>::is_same&lt;pointer, _Ptr&gt;,</span><br><span class="line">    <span class="built_in">std</span>::__not_&lt;<span class="built_in">std</span>::is_pointer&lt;_Ptr&gt;&gt;&gt;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Ptr, <span class="keyword">typename</span>... _Args&gt;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">typename</span> <span class="built_in">std</span>::enable_if&lt;__is_custom_pointer&lt;_Ptr&gt;::value&gt;::type</span><br><span class="line">    construct(_Alloc&amp; __a, _Ptr __p, _Args&amp;&amp;... __args) <span class="comment">//只有客户定义的_Ptr是指针的时候这个构造函数才有效</span></span><br><span class="line">    &#123;</span><br><span class="line">      _Base_type::construct(__a, <span class="built_in">std</span>::addressof(*__p),</span><br><span class="line">          <span class="built_in">std</span>::forward&lt;_Args&gt;(__args)...);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Ptr&gt;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">typename</span> <span class="built_in">std</span>::enable_if&lt;__is_custom_pointer&lt;_Ptr&gt;::value&gt;::type</span><br><span class="line">    destroy(_Alloc&amp; __a, _Ptr __p)</span><br><span class="line">    &#123; _Base_type::destroy(__a, <span class="built_in">std</span>::addressof(*__p)); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> _Alloc _S_select_on_copy(<span class="keyword">const</span> _Alloc&amp; __a)</span><br><span class="line">  &#123; <span class="keyword">return</span> _Base_type::select_on_container_copy_construction(__a); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">void</span> _S_on_swap(_Alloc&amp; __a, _Alloc&amp; __b)</span><br><span class="line">  &#123; <span class="built_in">std</span>::__alloc_on_swap(__a, __b); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//分别判断_Base_type是否有定义一下四个类型</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> _S_propagate_on_copy_assign()</span><br><span class="line">  &#123; <span class="keyword">return</span> _Base_type::propagate_on_container_copy_assignment::value; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> _S_propagate_on_move_assign()</span><br><span class="line">  &#123; <span class="keyword">return</span> _Base_type::propagate_on_container_move_assignment::value; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> _S_propagate_on_swap()</span><br><span class="line">  &#123; <span class="keyword">return</span> _Base_type::propagate_on_container_swap::value; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> _S_always_equal()</span><br><span class="line">  &#123; <span class="keyword">return</span> _Base_type::is_always_equal::value; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">bool</span> _S_nothrow_move()</span><br><span class="line">  &#123; <span class="keyword">return</span> _S_propagate_on_move_assign() || _S_always_equal(); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rebind</span></span></span><br><span class="line"><span class="class">    &#123;</span> <span class="keyword">typedef</span> <span class="keyword">typename</span> _Base_type::<span class="keyword">template</span> rebind_alloc&lt;_Tp&gt; other; &#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">  ......</span><br><span class="line">  ......</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>__and_、__not_、is_same、is_pointer、enable_if：定义在bits/type_traits文件。</p>
+<p>补充说明：<br>1、类型T为<font id="is_empty">is_empty</font>的定义：</p>
+<ul>
+<li>是一个类，但不能是union类型。</li>
+<li>没有非static数据成员，大小为0的位域除外。</li>
+<li>没有虚函数。</li>
+<li>没有虚基类。</li>
+<li>基类不能是非is_empty的。</li>
+</ul>
+<p>参考：<a href="http://www.enseignement.polytechnique.fr/informatique/INF478/docs/Cpp/en/cpp/concept/Allocator.html" target="_blank" rel="noopener">C++ concepts: Allocator</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+	
+	
+		<div>
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+		</div>
+	
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/stl/" rel="tag"><i class="fa fa-tag"></i> stl</a>
+          
+            <a href="/tags/c/" rel="tag"><i class="fa fa-tag"></i> c++</a>
+          
+            <a href="/tags/allocator/" rel="tag"><i class="fa fa-tag"></i> allocator</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/20/工作/stl之空间适配器allocator/" rel="next" title="stl之空间适配器allocator">
+                <i class="fa fa-chevron-left"></i> stl之空间适配器allocator
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/24/工作/stl之vector源码分析/" rel="prev" title="stl之vector源码分析">
+                stl之vector源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="Zhouxj25">
+            
+              <p class="site-author-name" itemprop="name">Zhouxj25</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zhouxj25" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zhouxj25@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-定义"><span class="nav-text">1. 定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-关系图"><span class="nav-text">2. 关系图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-allocator-traits-base解析"><span class="nav-text">3.__allocator_traits_base解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-allocator-traits解析"><span class="nav-text">4. allocator_traits解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-alloc-traits解析"><span class="nav-text">5. __alloc_traits解析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhouxj25</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/src/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/src/clipboard-use.js"></script>

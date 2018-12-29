@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="c++,dpdk,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
+<meta name="keywords" content="c++,dpdk">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vmware中Ubuntu安装dpdk">
+<meta property="og:url" content="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/index.html">
+<meta property="og:site_name" content="Zhouxj25&#39;s Blog">
+<meta property="og:description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-29T02:11:40.454Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vmware中Ubuntu安装dpdk">
+<meta name="twitter:description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/">
+
+
+
+
+
+  <title>Vmware中Ubuntu安装dpdk | Zhouxj25's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zhouxj25's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">每天都有收获的感觉真爽！！！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zhouxj25">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhouxj25's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Vmware中Ubuntu安装dpdk</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-07T22:00:00+08:00">
+                2018-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/blog/" itemprop="url" rel="index">
+                    <span itemprop="name">blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-准备"><a href="#1-准备" class="headerlink" title="1. 准备"></a>1. 准备</h2><p>系统版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># lsb_release  -a</span></span><br><span class="line">No LSB modules are available.</span><br><span class="line">Distributor ID:	Ubuntu</span><br><span class="line">Description:	Ubuntu 18.04.1 LTS</span><br><span class="line">Release:	18.04</span><br><span class="line">Codename:	bionic</span><br></pre></td></tr></table></figure></p>
+<p>dpdk版本</p>
+<blockquote>
+<p>dpdk-18.05.1</p>
+</blockquote>
+<p>网卡类型<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># lspci -v</span></span><br><span class="line">02:02.0 Ethernet controller: Intel Corporation 82545EM Gigabit Ethernet Controller (Copper) (rev 01)</span><br><span class="line">	Subsystem: VMware PRO/1000 MT Single Port Adapter</span><br><span class="line">	Physical Slot: 34</span><br><span class="line">	Flags: 66MHz, medium devsel, IRQ 16</span><br><span class="line">	Memory at fd5a0000 (64-bit, non-prefetchable) [size=128K]</span><br><span class="line">	Memory at fdfe0000 (64-bit, non-prefetchable) [size=64K]</span><br><span class="line">	I/O ports at 2040 [size=64]</span><br><span class="line">	[virtual] Expansion ROM at fd510000 [disabled] [size=64K]</span><br><span class="line">	Capabilities: [dc] Power Management version 2</span><br><span class="line">	Capabilities: [e4] PCI-X non-bridge device</span><br><span class="line">	Kernel driver <span class="keyword">in</span> use: igb_uio</span><br><span class="line">	Kernel modules: e1000</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h2 id="2-编写dpdk脚本"><a href="#2-编写dpdk脚本" class="headerlink" title="2. 编写dpdk脚本"></a>2. 编写dpdk脚本</h2><p>该脚本完成巨页、模块的的加载等功能<br>dpdk-setup.sh文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">  </span><br><span class="line">mkdir -p /mnt/huge</span><br><span class="line">mount -t hugetlbfs nodev /mnt/huge  <span class="comment">#挂在巨页</span></span><br><span class="line"><span class="built_in">echo</span> 200 &gt; /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages</span><br><span class="line"></span><br><span class="line">modprobe uio</span><br><span class="line">insmod <span class="variable">$RTE_SDK</span>/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko  <span class="comment">#加载驱动模块</span></span><br><span class="line"></span><br><span class="line">ifconfig ens34 down</span><br><span class="line"><span class="variable">$RTE_SDK</span>/usertools/dpdk-devbind.py -b igb_uio 02:02.0 <span class="comment">#绑定端口</span></span><br></pre></td></tr></table></figure></p>
+<p>修改dpdk-setup.sh文件权限为可执行，第一次执行dpdk程序时要执行该文件，可以在/etc/init.d中增加dpdk自动加载的服务，避免每次重启系统都手工执行dpdk-setup.sh加载文件。<br>/etc/init.d/dpdkd文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># dpdkd   This scripts setup dpdk environment.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Source function library.</span></span><br><span class="line">. /etc/init.d/<span class="built_in">functions</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span></span><br><span class="line">  start)</span><br><span class="line">        /root/dpdk-setup.sh</span><br><span class="line">        ;;</span><br><span class="line">  *)</span><br><span class="line">        <span class="built_in">echo</span> $<span class="string">"Usage: <span class="variable">$0</span> &#123;start&#125;"</span></span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure></p>
+<p>修改文件为可执行权限。</p>
+<h2 id="3-编译源码"><a href="#3-编译源码" class="headerlink" title="3. 编译源码"></a>3. 编译源码</h2><p>如果是想调试dpdk的源码，可以在编译前设置环境变量，export EXTRA_CFLAGS=’-O0 -g2’。<br>本系统是X86_64位系统<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># cd dpdk-stable-18.05.1</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1<span class="comment"># make config T=x86_64-native-linuxapp-gcc</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1<span class="comment"># make install T=x86_64-native-linuxapp-gcc</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="4-编译执行样例代码"><a href="#4-编译执行样例代码" class="headerlink" title="4. 编译执行样例代码"></a>4. 编译执行样例代码</h2><p>在/etc/profile增加环境变量</p>
+<blockquote>
+<p>export RTE_SDK=/root/dpdk-stable-18.05.1<br>更新环境变量<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># source /etc/profile</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<p>编译样例代码examples/helloworld<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># make</span></span><br><span class="line">  CC main.o</span><br><span class="line">  LD helloworld</span><br><span class="line">  INSTALL-APP helloworld</span><br><span class="line">  INSTALL-MAP helloworld.map</span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># ./build/helloworld -l 1-3 -n 2</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># ./build/helloworld -l 1-3 -n 2</span></span><br><span class="line">EAL: Detected 4 lcore(s)</span><br><span class="line">EAL: Detected 1 NUMA nodes</span><br><span class="line">EAL: Multi-process socket /var/run/dpdk/rte/mp_socket</span><br><span class="line">EAL: No free hugepages reported <span class="keyword">in</span> hugepages-1048576kB</span><br><span class="line">EAL: Probing VFIO support...</span><br><span class="line">EAL: PCI device 0000:02:01.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">EAL: PCI device 0000:02:02.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">EAL: Error reading from file descriptor 18: Input/output error</span><br><span class="line">hello from core 2</span><br><span class="line">EAL: Error reading from file descriptor 18: Input/output error</span><br><span class="line">EAL: Error reading from file descriptor 18: Input/output error</span><br><span class="line">EAL: Error reading from file descriptor 18: Input/output error</span><br><span class="line">hello from core 3</span><br><span class="line">hello from core 1</span><br><span class="line">EAL: Error reading from file descriptor 18: Input/output error</span><br></pre></td></tr></table></figure></p>
+<p>出现这种错误的原因是VMware中的INTX（中断机制）仿真不佳，所以会一直输出这个错误。如果想屏蔽这个错误，可以按一下步骤解决。</p>
+<ol>
+<li><p>修改源码kernel/linux/igb_uio/igb_uio.c文件</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> RTE_INTR_MODE_LEGACY:</span><br><span class="line">		<span class="comment">//if (pci_intx_mask_supported(udev-&gt;pdev)) &#123; //注释对intx的判断</span></span><br><span class="line">			dev_dbg(&amp;udev-&gt;pdev-&gt;dev, <span class="string">"using INTX"</span>);</span><br><span class="line">			udev-&gt;info.irq_flags = IRQF_SHARED | IRQF_NO_THREAD;</span><br><span class="line">			udev-&gt;info.irq = udev-&gt;pdev-&gt;irq;</span><br><span class="line">			udev-&gt;mode = RTE_INTR_MODE_LEGACY;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="comment">//&#125;</span></span><br><span class="line">		dev_notice(&amp;udev-&gt;pdev-&gt;dev, <span class="string">"PCI INTX mask not supported\n"</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重新编译dpdk源码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/x86_64-native-linuxapp-gcc<span class="comment"># make</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重新加载igb_uio模块</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># rmmod igb_uio  //先删除</span></span><br><span class="line">root@zhouxj:~<span class="comment">#./dpdk-setup.sh       //重新加载模块并绑定端口</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重新编译执行样例代码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># make clean</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># make</span></span><br><span class="line">  CC main.o</span><br><span class="line">  LD helloworld</span><br><span class="line">  INSTALL-APP helloworld</span><br><span class="line">  INSTALL-MAP helloworld.map</span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># ./build/helloworld -l 1-3 -n 2</span></span><br><span class="line">EAL: Detected 4 lcore(s)</span><br><span class="line">EAL: Detected 1 NUMA nodes</span><br><span class="line">EAL: Multi-process socket /var/run/dpdk/rte/mp_socket</span><br><span class="line">EAL: No free hugepages reported <span class="keyword">in</span> hugepages-1048576kB</span><br><span class="line">EAL: Probing VFIO support...</span><br><span class="line">EAL: PCI device 0000:02:01.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">EAL: PCI device 0000:02:02.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">hello from core 2</span><br><span class="line">hello from core 3</span><br><span class="line">hello from core 1</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>正常输出</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+	
+	
+		<div>
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+		</div>
+	
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"><i class="fa fa-tag"></i> c++</a>
+          
+            <a href="/tags/dpdk/" rel="tag"><i class="fa fa-tag"></i> dpdk</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/30/生活/蹭游拉萨（三）/" rel="next" title="蹭游拉萨（三）">
+                <i class="fa fa-chevron-left"></i> 蹭游拉萨（三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="Zhouxj25">
+            
+              <p class="site-author-name" itemprop="name">Zhouxj25</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zhouxj25" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zhouxj25@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备"><span class="nav-text">1. 准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-编写dpdk脚本"><span class="nav-text">2. 编写dpdk脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-编译源码"><span class="nav-text">3. 编译源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-编译执行样例代码"><span class="nav-text">4. 编译执行样例代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhouxj25</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/src/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/src/clipboard-use.js"></script>

@@ -82,14 +82,14 @@
 <meta name="description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
 <meta name="keywords" content="c++,dpdk">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Vmware中Ubuntu安装dpdk">
-<meta property="og:url" content="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/index.html">
+<meta property="og:title" content="Vmware中Ubuntu安装DPDK">
+<meta property="og:url" content="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装DPDK/index.html">
 <meta property="og:site_name" content="Zhouxj25&#39;s Blog">
 <meta property="og:description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-12-29T02:11:40.454Z">
+<meta property="og:updated_time" content="2018-12-31T01:16:16.638Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Vmware中Ubuntu安装dpdk">
+<meta name="twitter:title" content="Vmware中Ubuntu安装DPDK">
 <meta name="twitter:description" content="1. 准备系统版本123456root@zhouxj:~# lsb_release  -aNo LSB modules are available.Distributor ID:	UbuntuDescription:	Ubuntu 18.04.1 LTSRelease:	18.04Codename:	bionic dpdk版本  dpdk-18.05.1  网卡类型1234567891011121">
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/">
+  <link rel="canonical" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装DPDK/">
 
 
 
 
 
-  <title>Vmware中Ubuntu安装dpdk | Zhouxj25's Blog</title>
+  <title>Vmware中Ubuntu安装DPDK | Zhouxj25's Blog</title>
   
 
 
@@ -263,7 +263,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装dpdk/">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2018/10/07/工作/Vmware中Ubuntu安装DPDK/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Zhouxj25">
@@ -280,7 +280,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Vmware中Ubuntu安装dpdk</h1>
+          <h1 class="post-title" itemprop="name headline">Vmware中Ubuntu安装DPDK</h1>
         
 
         <div class="post-meta">
@@ -362,7 +362,7 @@
 <h2 id="2-编写dpdk脚本"><a href="#2-编写dpdk脚本" class="headerlink" title="2. 编写dpdk脚本"></a>2. 编写dpdk脚本</h2><p>该脚本完成巨页、模块的的加载等功能<br>dpdk-setup.sh文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">  </span><br><span class="line">mkdir -p /mnt/huge</span><br><span class="line">mount -t hugetlbfs nodev /mnt/huge  <span class="comment">#挂在巨页</span></span><br><span class="line"><span class="built_in">echo</span> 200 &gt; /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages</span><br><span class="line"></span><br><span class="line">modprobe uio</span><br><span class="line">insmod <span class="variable">$RTE_SDK</span>/x86_64-native-linuxapp-gcc/kmod/igb_uio.ko  <span class="comment">#加载驱动模块</span></span><br><span class="line"></span><br><span class="line">ifconfig ens34 down</span><br><span class="line"><span class="variable">$RTE_SDK</span>/usertools/dpdk-devbind.py -b igb_uio 02:02.0 <span class="comment">#绑定端口</span></span><br></pre></td></tr></table></figure></p>
 <p>修改dpdk-setup.sh文件权限为可执行，第一次执行dpdk程序时要执行该文件，可以在/etc/init.d中增加dpdk自动加载的服务，避免每次重启系统都手工执行dpdk-setup.sh加载文件。<br>/etc/init.d/dpdkd文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># dpdkd   This scripts setup dpdk environment.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Source function library.</span></span><br><span class="line">. /etc/init.d/<span class="built_in">functions</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span></span><br><span class="line">  start)</span><br><span class="line">        /root/dpdk-setup.sh</span><br><span class="line">        ;;</span><br><span class="line">  *)</span><br><span class="line">        <span class="built_in">echo</span> $<span class="string">"Usage: <span class="variable">$0</span> &#123;start&#125;"</span></span><br><span class="line">        <span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure></p>
 <p>修改文件为可执行权限。</p>
-<h2 id="3-编译源码"><a href="#3-编译源码" class="headerlink" title="3. 编译源码"></a>3. 编译源码</h2><p>如果是想调试dpdk的源码，可以在编译前设置环境变量，export EXTRA_CFLAGS=’-O0 -g2’。<br>本系统是X86_64位系统<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># cd dpdk-stable-18.05.1</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1<span class="comment"># make config T=x86_64-native-linuxapp-gcc</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1<span class="comment"># make install T=x86_64-native-linuxapp-gcc</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="3-编译源码"><a href="#3-编译源码" class="headerlink" title="3. 编译源码"></a>3. 编译源码</h2><p>如果是想调试dpdk的源码，可以在编译前设置环境变量，export EXTRA_CFLAGS=’-O0 -g2’。<br>本系统是X86_64位系统<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># cd dpdk-stable-18.05.1</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1<span class="comment"># make install T=x86_64-native-linuxapp-gcc</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="4-编译执行样例代码"><a href="#4-编译执行样例代码" class="headerlink" title="4. 编译执行样例代码"></a>4. 编译执行样例代码</h2><p>在/etc/profile增加环境变量</p>
 <blockquote>
 <p>export RTE_SDK=/root/dpdk-stable-18.05.1<br>更新环境变量<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># source /etc/profile</span></span><br></pre></td></tr></table></figure></p>
@@ -377,7 +377,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/x86_64-native-linuxapp-gcc<span class="comment"># make</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>重新加载igb_uio模块</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># rmmod igb_uio  //先删除</span></span><br><span class="line">root@zhouxj:~<span class="comment">#./dpdk-setup.sh       //重新加载模块并绑定端口</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~<span class="comment"># rmmod igb_uio  //先删除</span></span><br><span class="line">root@zhouxj:~<span class="comment">#./dpdk-setup.sh //重新加载模块并绑定端口</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>重新编译执行样例代码</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># make clean</span></span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># make</span></span><br><span class="line">  CC main.o</span><br><span class="line">  LD helloworld</span><br><span class="line">  INSTALL-APP helloworld</span><br><span class="line">  INSTALL-MAP helloworld.map</span><br><span class="line">root@zhouxj:~/dpdk-stable-18.05.1/examples/helloworld<span class="comment"># ./build/helloworld -l 1-3 -n 2</span></span><br><span class="line">EAL: Detected 4 lcore(s)</span><br><span class="line">EAL: Detected 1 NUMA nodes</span><br><span class="line">EAL: Multi-process socket /var/run/dpdk/rte/mp_socket</span><br><span class="line">EAL: No free hugepages reported <span class="keyword">in</span> hugepages-1048576kB</span><br><span class="line">EAL: Probing VFIO support...</span><br><span class="line">EAL: PCI device 0000:02:01.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">EAL: PCI device 0000:02:02.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">hello from core 2</span><br><span class="line">hello from core 3</span><br><span class="line">hello from core 1</span><br></pre></td></tr></table></figure>

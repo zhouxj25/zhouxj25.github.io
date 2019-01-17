@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="c++,tldk,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="1. 简介l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。 1.1 后端（BE）BE的责任：  通过">
+<meta name="keywords" content="c++,tldk">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tldk l4fwd用例说明">
+<meta property="og:url" content="https://zhouxj25.github.io/2018/10/27/工作/tldk l4fwd用例说明/index.html">
+<meta property="og:site_name" content="Zhouxj25&#39;s Blog">
+<meta property="og:description" content="1. 简介l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。 1.1 后端（BE）BE的责任：  通过">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-17T13:52:58.316Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tldk l4fwd用例说明">
+<meta name="twitter:description" content="1. 简介l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。 1.1 后端（BE）BE的责任：  通过">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://zhouxj25.github.io/2018/10/27/工作/tldk l4fwd用例说明/">
+
+
+
+
+
+  <title>tldk l4fwd用例说明 | Zhouxj25's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Zhouxj25's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">每天都有收获的感觉真爽！！！</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouxj25.github.io/2018/10/27/工作/tldk l4fwd用例说明/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zhouxj25">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Zhouxj25's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tldk l4fwd用例说明</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-27T20:00:00+08:00">
+                2018-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/blog/" itemprop="url" rel="index">
+                    <span itemprop="name">blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1. 简介"></a>1. 简介</h2><p>l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。<br>l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。</p>
+<h3 id="1-1-后端（BE）"><a href="#1-1-后端（BE）" class="headerlink" title="1.1 后端（BE）"></a>1.1 后端（BE）</h3><p>BE的责任：</p>
+<ul>
+<li>通过DPDK网卡接收报文并将其注入到TLDK TCP/UDP上下文中。</li>
+<li>检索TLDK TCP/UDP上下文中是否有需要发送的报文,并通过DPDK网卡发送出去。</li>
+<li>通过RSS使每个端口支持多个RX/TX队列。TX队列的数量等于RX队列的数量。</li>
+</ul>
+<a id="more"></a>
+<p>每一个BE核能服务多个DPDK端口，TLDK TCP/UDP上下文。<br>BE配置规则：</p>
+<blockquote>
+<p>port=&lt;uint>,addr=&lt;ipv4/ipv6&gt;,masklen=&lt;uint>,mac=&lt;ether>&lt;mtu></p>
+</blockquote>
+<p>说明：<br>port：DPDK用来发包的端口（可参考DPDK的配置），这个配置是必须的。<br>addr：主机网络IP，这个配置是必须的。<br>masklen：主机网络IP掩码长度，这个配置是必须的。<br>mac：主机网络MAC地址，这个配置是必须的。<br>mtu：MTU长度，这个配置是可选的。<br>示例：</p>
+<blockquote>
+<p>port=0,masklen=16,addr=192.168.0.0,mac=01:de:ad:be:ef:01</p>
+</blockquote>
+<blockquote>
+<p>port=0,addr=2001:4860:b002::,masklen=64,mac=01:de:ad:be:ef:01</p>
+</blockquote>
+<p>把配置保存到be.cfg文件中。</p>
+<h3 id="1-2-前端（FE）"><a href="#1-2-前端（FE）" class="headerlink" title="1.2 前端（FE）"></a>1.2 前端（FE）</h3><p>FE的责任：</p>
+<ul>
+<li>执行发送/接收配置的TCP/UDP流，这些流可以属于不同的TCP/UDP上下文。</li>
+</ul>
+<p>在UDP模式下，应用程序可以组合输入的IP分片，也可以对输出的包进行IP分片（如果数据包大小大于MTU）。<br>FE配置规则：</p>
+<blockquote>
+<p>lcore=&lt;uint>,op=&lt;”rx|tx|echo|fwd|rxtx”>,laddr=&lt;ip>,lport=&lt;uint16>,raddr=&lt;ip>,rport=&lt;uint16>,[txlen=&lt;uint>,fwladdr=&lt;ip>,fwlport=&lt;uint16>,fwraddr=&lt;ip>,fwrport=&lt;uint16>,belcore=&lt;uint>,rxlen=&lt;uint>]</p>
+</blockquote>
+<p>说明：<br>lcore：DPDK EAL负责处理FE的核，这个配置是必须的。<br>belcore：DPDK EAL负责处理BE的核，这个配置是可选的，lcore和belcore可以指定为相同的核。<br>op：在数据流上执行的操作:<br>         “rx” - 只执行接收操作。<br>         “tx” - 只执行发送操作。<br>         “echo” - 在流上模仿recvfrom(…, &amp;addr);sendto(…, &amp;addr)操作。<br>         “fwd” - 在数据流间进行转发操作。<br>         “rxtx” - 执行接收发送操作。<br>         这个配置是必须的。<br>laddr：数据流open操作的本地地址，这个配置是必须的。<br>lport：数据流open操作的本地端口，这个配置是必须的。<br>raddr：数据流open操作的远端地址，这个配置是必须的。<br>rport：数据流open操作的远端端口，这个配置是必须的。<br>txlen：每一个发送的数据包的长度。只有在op操作是”tx”和”rxtx”模式的时候有效。<br>rxlen：期待的响应数据包长度，只有在op操作是”rxtx”模式的时候有效。<br>fwladdr：数据流转发open操作的本地地址，只有在op操作是”fwd”模式的时候有效。<br>fwlport：数据流转发open操作的本地端口，只有在op操作是”fwd”模式的时候有效。<br>fwraddr：数据流转发open操作的远端地址，只有op操作是”fwd”模式的时候有效。<br>fwrport：数据流转发open操作的远端端口，只有op操作是”fwd”模式的时候有效。<br>示例：</p>
+<blockquote>
+<p>lcore=3,op=echo,laddr=192.168.1.233,lport=0x8000,raddr=0.0.0.0,rport=0</p>
+</blockquote>
+<blockquote>
+<p>lcore=3,op=tx,laddr=192.168.1.233,lport=0x8001,raddr=192.168.1.56,rport=0x200,txlen=72</p>
+</blockquote>
+<blockquote>
+<p>lcore=3,op=rx,laddr=::,lport=0x200,raddr=::,rport=0,txlen=72</p>
+</blockquote>
+<blockquote>
+<p>lcore=3,op=fwd,laddr=0.0.0.0,lport=11211,raddr=0.0.0.0,rport=0,fwladdr=::,<br>fwlport=0,fwraddr=2001:4860:b002::56,fwrport=11211</p>
+</blockquote>
+<p>把配置保存到fe.cfg文件中。</p>
+<h2 id="2-BE、FE实例配置"><a href="#2-BE、FE实例配置" class="headerlink" title="2. BE、FE实例配置"></a>2. BE、FE实例配置</h2><p>be.cfg：</p>
+<blockquote>
+<p>port=0,masklen=24,addr=192.168.3.54,mac=00:0c:29:d6:e3:77</p>
+</blockquote>
+<p>fe.cfg</p>
+<blockquote>
+<p>lcore=3,op=echo,laddr=192.168.3.54,lport=6000,raddr=0.0.0.0,rport=0</p>
+</blockquote>
+<h2 id="3-编译l4fwd样例"><a href="#3-编译l4fwd样例" class="headerlink" title="3. 编译l4fwd样例"></a>3. 编译l4fwd样例</h2><p>如果需要输出接收包的详细信息，需要加上–debug选项。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/fdio/tldk/examples/l4fwd<span class="comment"># make --debug</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="4-执行"><a href="#4-执行" class="headerlink" title="4. 执行"></a>4. 执行</h2><p>在执行之前，先加载DPDK启动需要的设置，如大页等，具体参看《<a href="../../../07/工作/Vmware中Ubuntu安装DPDK">Vmware中Ubuntu安装DPDK</a>》。<br>说明：</p>
+<ul>
+<li>在这里设置的l4fwd做为服务端，TCP监听6000端口。</li>
+<li>开启arp，可以让远端路由寻址到该服务端地址，并且开启混杂模式。</li>
+<li>设置接收和发送缓冲区以及最大连接数量为0x100。</li>
+<li>-T为指定TCP模式，-L指定监听（服务端模式）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/fdio/tldk/examples/l4fwd/build/app<span class="comment"># ./l4fwd  --lcores='3' -w 02:02.0 -- --enable-arp --promisc --rbufs 0x100 --sbufs 0x100 --streams 0x100 --fecfg fe.cfg --becfg be.cfg -T -L port=0,lcore=3,ipv4=192.168.3.54</span></span><br><span class="line">EAL: Detected 4 lcore(s)</span><br><span class="line">EAL: Detected 1 NUMA nodes</span><br><span class="line">EAL: Multi-process socket /var/run/dpdk/rte/mp_socket</span><br><span class="line">EAL: Probing VFIO support...</span><br><span class="line">EAL: PCI device 0000:02:02.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">USER1: port_init: rte_eth_dev_configure(prt_id=0, nb_rxq=1, nb_txq=1) returns 0;</span><br><span class="line">eth_em_rx_queue_setup(): drop_en functionality not supported by device</span><br><span class="line">USER1: queue_init: rx queue=0 setup failed with error code: -22</span><br><span class="line">USER1: netbe_port_init: lcore=3 queue init failed with err: -22</span><br><span class="line">EAL: Error - exiting with code: 1</span><br><span class="line">  Cause: main: netbe_port_init failed with error code: -22</span><br></pre></td></tr></table></figure>
+<p>上面的错误是因为em设备并不支持drop_en功能的原因，而这里的网卡设备是e1000驱动（e1000和e1000e驱动都称为em，驱动em和igb有时也被归为e1000系列，关于<a href="https://core.dpdk.org/supported/" target="_blank" rel="noopener">DPDK支持的设备类型</a>）。修改样例源码port.h，注释该行：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dev_info.default_rxconf.rx_drop_en = <span class="number">1</span>;</span><br></pre></td></tr></table></figure></p>
+<p>重新编译运行。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">EAL: Probing VFIO support...</span><br><span class="line">EAL: PCI device 0000:02:02.0 on NUMA socket -1</span><br><span class="line">EAL:   Invalid NUMA socket, default to 0</span><br><span class="line">EAL:   probe driver: 8086:100f net_e1000_em</span><br><span class="line">USER1: port_init: rte_eth_dev_configure(prt_id=0, nb_rxq=1, nb_txq=1) returns 0;</span><br><span class="line">USER1: ucfg @ 0x5646f8246460, prt_num = 1</span><br><span class="line">USER1: uprt 0x7fc4fffaff00 = &lt;id = 0, lcore = &lt;3&gt;, mtu = 1514, rx_offload = 0, tx_offload = 0,</span><br><span class="line">ipv4 = 0x3603a8c0, ipv6 = 0000:0000:0000:0000:0000:0000:0000:0000, mac = 00:0c:29:d6:e3:77&gt;;</span><br><span class="line">hashkey = ;</span><br><span class="line">USER1: lc=3, q=0, nb_bl_ports=0</span><br><span class="line">USER1: lcore_lpm_init(lcore=3): lpm4=0x7fe1e58fb800;</span><br><span class="line">USER1: lcore_lpm_init(lcore=3): lpm6=0x7fe1e14fb740;</span><br><span class="line">USER1: rte_ip_frag_table_create: allocated of 1572992 bytes at socket 0</span><br><span class="line">USER1: create_context(lcore=3): frag_tbl=0x7fe1e137b680;</span><br><span class="line">USER1: create_context(lcore=3): proto=tcp, ctx=0x7fc4fff4a240;</span><br><span class="line">USER1: lcore_init(lcore=3, port=0, qid=0), dev: 0x7fc4fff4e300</span><br><span class="line">USER1: netbe_add_ipv4_route(lcore=3,port=0,dev=0x7fc4fff4e300,ipv4=192.168.3.54/24,mtu=1514,mac=00:0c:29:d6:e3:77) returns 0;</span><br><span class="line">USER1: main: starting port 0</span><br><span class="line">USER1: lcore_main_tcp(lcore=3) start</span><br><span class="line">USER1: netfe_lcore_init_tcp(lcore=3, nb_streams=1, max_streams=256)</span><br><span class="line">USER1: netfe_lcore_init_tcp(3) synevq=0x7fc4fff70480, erevq=0x7fc4fff6c400, rxevq=0x7fc4fff68380, txevq=0x7fc4fff64300</span><br><span class="line">USER1: netfe_stream_open_tcp(3)=&#123;s=0x7fc4fff26200, op=3, proto=tcp, rxev=0x7fc4fff704c0, txev=0x7fc4fff68300&#125;, belc=3</span><br><span class="line">USER1: stream@0x7fe1e0fcdad0=&#123;s=0x7fc4fff26200,family=2,proto=tcp,laddr=192.168.3.54,lport=6000,raddr=0.0.0.0,rport=0;stats=&#123;rxp=0,rxb=0,txp=0,txb=0,drops=0,rxev[IDLE, DOWN, UP]=[0, 1, 0],txev[IDLE, DOWN, UP]=[0, 0, 0]&#125;;&#125;;</span><br><span class="line">USER1: netfe_lcore_init_tcp(3) tle_tcp_stream_listen(stream=0x7fc4fff26200) returns 0</span><br><span class="line">USER1: netbe_lcore_setup:(lcore=3, proto=tcp, ctx=0x7fc4fff4a240) start</span><br><span class="line">USER1: netbe_lcore_setup:0(port=0, q=0, proto=tcp, dev=0x7fc4fff4e300)</span><br><span class="line">USER1: setup_rx_cb(port=0), setup RX callback <span class="string">"tcp with arp no HW ptype"</span> returns 0x7fc4ffe002c0;</span><br><span class="line">dump mbuf at 0x7fe1ed511d40, iova=6d511dc0, buf_len=2176</span><br><span class="line">  pkt_len=1287, ol_flags=0, nb_segs=1, in_port=0</span><br><span class="line">  segment at 0x7fe1ed511d40, data=0x7fe1ed511e40, data_len=1287</span><br><span class="line">  Dump data at [0x7fe1ed511e40], len=64</span><br><span class="line">00000000: FF FF FF FF FF FF 20 59 A0 C2 62 94 08 00 45 00 | ...... Y..b...E.</span><br><span class="line">00000010: 04 F9 00 00 40 00 FF 11 EE 9B C0 A8 03 08 C0 A8 | ....@...........</span><br><span class="line">00000020: 03 FF 14 E9 14 E9 04 E5 DB 21 00 00 84 00 00 00 | .........!......</span><br><span class="line">00000030: 00 0E 00 00 00 05 01 38 01 33 03 31 36 38 03 31 | .......8.3.168.1</span><br><span class="line">netbe_rx(3): rte_eth_rx_burst(0, 0) returns 1</span><br><span class="line">netbe_rx(3): tle_tcp_rx_bulk(0x7fc4fff4e300, 1) returns 0</span><br><span class="line">netbe_rx:551(port=0) rp[0]=&#123;0x7fe1ed511d40, 22&#125;;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+	
+	
+		<div>
+		<div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-heart"></i>感谢您的阅读-------------</div>
+    
+</div>
+		</div>
+	
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/c/" rel="tag"><i class="fa fa-tag"></i> c++</a>
+          
+            <a href="/tags/tldk/" rel="tag"><i class="fa fa-tag"></i> tldk</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/08/工作/Vmware中Ubuntu安装Seastar/" rel="next" title="Vmware中Ubuntu安装Seastar">
+                <i class="fa fa-chevron-left"></i> Vmware中Ubuntu安装Seastar
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/27/工作/Vmware中Ubuntu安装tldk/" rel="prev" title="Vmware中Ubuntu安装tldk">
+                Vmware中Ubuntu安装tldk <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/header.jpg" alt="Zhouxj25">
+            
+              <p class="site-author-name" itemprop="name">Zhouxj25</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/zhouxj25" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zhouxj25@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简介"><span class="nav-text">1. 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-后端（BE）"><span class="nav-text">1.1 后端（BE）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-前端（FE）"><span class="nav-text">1.2 前端（FE）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-BE、FE实例配置"><span class="nav-text">2. BE、FE实例配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-编译l4fwd样例"><span class="nav-text">3. 编译l4fwd样例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-执行"><span class="nav-text">4. 执行</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zhouxj25</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_lines.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+
+<!-- 代码块复制功能 -->
+<script type="text/javascript" src="/js/src/clipboard.min.js"></script>  
+<script type="text/javascript" src="/js/src/clipboard-use.js"></script>

@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Zhouxj25&#39;s Blog">
 <meta property="og:description" content="1. 简介l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。 1.1 后端（BE）BE的责任：  通过">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-18T02:41:15.837Z">
+<meta property="og:updated_time" content="2019-01-18T06:45:47.181Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tldk l4fwd用例说明">
 <meta name="twitter:description" content="1. 简介l4fwd是演示和测试TLDK TCP/UDP功能的示例应用程序。根据用户配置，可以实现简单的send、recv或者send+recv已经打开的TCP/UDP数据流。他还实现了TCP/UDP不同流之间的数据包转发功能。所以可以使用l4fwd应用程序作为简单的TCP/UDP代理。l4fwd应用程序逻辑上分为两个部分：后端(BE) 和 前端(FE)。 1.1 后端（BE）BE的责任：  通过">
@@ -402,7 +402,7 @@
 <blockquote>
 <p>lcore=3,op=echo,laddr=192.168.3.54,lport=6000,raddr=0.0.0.0,rport=0</p>
 </blockquote>
-<h2 id="3-编译l4fwd样例"><a href="#3-编译l4fwd样例" class="headerlink" title="3. 编译l4fwd样例"></a>3. 编译l4fwd样例</h2><p>如果需要输出接收包的详细信息，需要加上–debug选项。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/fdio/tldk/examples/l4fwd<span class="comment"># make --debug</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="3-编译l4fwd样例"><a href="#3-编译l4fwd样例" class="headerlink" title="3. 编译l4fwd样例"></a>3. 编译l4fwd样例</h2><p>如果需要输出接收包的详细信息，需要加上打开NETFE_DEBUG和NETBE_DEBUG宏。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@zhouxj:~/fdio/tldk/examples/l4fwd<span class="comment"># export EXTRA_CFLAGS+="-DNETBE_DEBUG -DNETFE_DEBUG"</span></span><br><span class="line">root@zhouxj:~/fdio/tldk/examples/l4fwd<span class="comment"># make --debug</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="4-执行"><a href="#4-执行" class="headerlink" title="4. 执行"></a>4. 执行</h2><p>在执行之前，先加载DPDK启动需要的设置，如大页等，具体参看《<a href="../../../07/工作/Vmware中Ubuntu安装DPDK">Vmware中Ubuntu安装DPDK</a>》。<br>说明：</p>
 <ul>
 <li>在这里设置的l4fwd做为服务端，TCP监听6000端口。</li>
